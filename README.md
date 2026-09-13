@@ -183,7 +183,7 @@ Python **3.10+** is recommended.
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/YOUR-USERNAME/YOUR-REPOSITORY.git
+git clone https://github.com/aqsakhursheed/uet-hostel-management-system
 cd uet-hostel-management-system
 ```
 
