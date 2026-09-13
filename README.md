@@ -184,7 +184,7 @@ Python **3.10+** is recommended.
 
 ```bash
 git clone https://github.com/YOUR-USERNAME/YOUR-REPOSITORY.git
-cd YOUR-REPOSITORY
+cd uet-hostel-management-system
 ```
 
 ### 2. Create a virtual environment
