@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Student Portal — UET Hostel</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Inter',sans-serif; background:#f5f7fa; color:#0f172a; min-height:100vh; }
+
+/* Navbar */
+.navbar {
+  position:sticky; top:0; z-index:50;
+  background:rgba(255,255,255,0.96); backdrop-filter:blur(20px);
+  border-bottom:1px solid #e2e8f0; padding:0 5%; height:64px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+
+/* Form card */
+.form-card {
+  background:#ffffff; border:1px solid #e2e8f0;
+  border-radius:20px; box-shadow:0 2px 12px rgba(0,0,0,0.06);
+}
+
+/* Input */
+.field-input {
+  width:100%; background:#f8fafc; border:1.5px solid #e2e8f0;
+  border-radius:10px; padding:13px 16px; color:#0f172a;
+  font-size:0.9rem; font-family:inherit; outline:none; transition:all 0.25s ease;
+}
+.field-input:focus { border-color:#1d4ed8; box-shadow:0 0 0 3px rgba(29,78,216,0.1); background:#fff; }
+.field-input::placeholder { color:#c1c9d6; }
+.field-input option { background:#ffffff; color:#0f172a; }
+.field-label {
+  display:block; font-size:0.75rem; font-weight:600; color:#475569;
+  text-transform:uppercase; letter-spacing:1px; margin-bottom:7px;
+}
+
+/* Section header */
+.section-header { display:flex; align-items:center; gap:12px; margin-bottom:24px; }
+.section-icon { width:38px; height:38px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:0.85rem; }
+
+/* Progress bar */
+.p-step { display:flex; align-items:center; gap:8px; font-size:0.78rem; font-weight:600; color:#94a3b8; }
+.p-step.done { color:#16a34a; }
+.p-step.active { color:#1d4ed8; }
+.p-dot {
+  width:28px; height:28px; border-radius:50%; border:2px solid #e2e8f0;
+  background:transparent; display:flex; align-items:center; justify-content:center;
+  font-size:0.7rem; font-weight:700; color:#94a3b8; transition:all 0.3s; flex-shrink:0;
+}
+.p-step.done .p-dot { background:#16a34a; border-color:#16a34a; color:white; }
+.p-step.active .p-dot { background:#1d4ed8; border-color:#1d4ed8; color:white; box-shadow:0 0 12px rgba(29,78,216,0.35); }
+.p-line { flex:1; height:1px; background:#e2e8f0; min-width:20px; max-width:60px; }
+.p-step.done + .p-line { background:#16a34a; }
+.p-step.active + .p-line { background:rgba(29,78,216,0.25); }
+
+/* Submit button */
+.btn-submit {
+  width:100%; padding:16px;
+  background:linear-gradient(135deg,#1d4ed8,#3b82f6); color:white;
+  border:none; border-radius:12px; font-size:1rem; font-weight:700;
+  font-family:inherit; cursor:pointer; transition:all 0.3s ease;
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  box-shadow:0 4px 24px rgba(29,78,216,0.3);
+}
+.btn-submit:hover { box-shadow:0 8px 40px rgba(29,78,216,0.45); transform:translateY(-1px); }
+.btn-submit:disabled { opacity:0.5; pointer-events:none; }
+
+/* Checkbox */
+.checkbox-label {
+  display:flex; align-items:center; gap:10px; cursor:pointer;
+  font-size:0.88rem; color:#475569; padding:12px 14px;
+  border:1.5px solid #e2e8f0; border-radius:10px;
+  transition:all 0.2s; user-select:none;
+}
+.checkbox-label:hover { border-color:rgba(29,78,216,0.3); background:rgba(29,78,216,0.04); }
+.checkbox-label input[type=checkbox] { display:none; }
+.checkbox-box {
+  width:20px; height:20px; border-radius:6px; border:2px solid #cbd5e1;
+  background:#f8fafc; display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; transition:all 0.2s;
+}
+.checkbox-label input:checked ~ .checkbox-box { background:#1d4ed8; border-color:#1d4ed8; }
+.checkbox-label input:checked ~ .checkbox-box::after { content:'✓'; color:white; font-size:0.7rem; font-weight:700; }
+
+/* Status card */
+.status-card { background:#f8fafc; border:1px solid #e2e8f0; border-radius:16px; padding:20px; }
+
+/* Success screen */
+.success-panel { display:none; text-align:center; }
+.success-icon {
+  width:80px; height:80px; border-radius:50%;
+  background:linear-gradient(135deg,rgba(34,197,94,0.1),rgba(16,185,129,0.05));
+  border:2px solid rgba(34,197,94,0.3);
+  display:flex; align-items:center; justify-content:center;
+  margin:0 auto 24px; font-size:2rem; color:#16a34a; animation:pop 0.4s ease;
+}
+@keyframes pop { 0%{transform:scale(0.7);opacity:0} 60%{transform:scale(1.1)} 100%{transform:scale(1);opacity:1} }
+.app-id-box {
+  background:#eff6ff; border:1px solid #bfdbfe;
+  border-radius:12px; padding:20px 24px; margin:20px 0;
+}
+.app-id { font-size:1.5rem; font-weight:800; color:#1d4ed8; letter-spacing:3px; font-family:monospace; }
+
+/* Status lookup */
+.lookup-result { display:none; margin-top:16px; }
+.status-badge { display:inline-flex; align-items:center; gap:8px; padding:6px 16px; border-radius:100px; font-size:0.8rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; }
+.status-pending  { background:rgba(245,158,11,0.1);  border:1px solid rgba(245,158,11,0.3);  color:#d97706; }
+.status-approved { background:rgba(22,163,74,0.1);   border:1px solid rgba(22,163,74,0.3);   color:#16a34a; }
+.status-rejected { background:rgba(220,38,38,0.1);   border:1px solid rgba(220,38,38,0.3);   color:#dc2626; }
+
+/* Tab switcher */
+.tab-btn {
+  flex:1; padding:11px 0; border-radius:10px;
+  border:1px solid #e2e8f0; background:transparent;
+  color:#64748b; font-size:0.85rem; font-weight:600;
+  cursor:pointer; font-family:inherit; transition:all 0.25s;
+}
+.tab-btn:hover { background:#f1f5f9; }
+.tab-btn.active { background:#eff6ff; border-color:#bfdbfe; color:#1d4ed8; }
+
+@keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(22,163,74,0.4)} 50%{box-shadow:0 0 0 6px rgba(22,163,74,0)} }
+</style>
+</head>
+<body>
+
+<!-- ── NAVBAR ── -->
+<nav class="navbar">
+  <a href="/" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+    <img src="https://www.pngitem.com/pimgs/m/17-171570_uet-lahore-logo-clipart-png-download-university-of.png"
+         alt="UET" style="width:36px;height:36px;border-radius:50%;border:2px solid rgba(29,78,216,0.3);background:white;padding:4px;object-fit:contain;">
+    <span style="font-weight:700;font-size:0.92rem;color:#0f172a;">UET Hostel</span>
+  </a>
+  <div style="display:flex;align-items:center;gap:16px;">
+    <a href="/" style="color:#64748b;font-size:0.82rem;text-decoration:none;" onmouseover="this.style.color='#1d4ed8'" onmouseout="this.style.color='#64748b'">← Home</a>
+    <span id="nav-username" style="font-size:0.82rem;font-weight:600;color:#0f172a;background:#f1f5f9;padding:6px 14px;border-radius:8px;border:1px solid #e2e8f0;">
+      <i class="fas fa-user-circle" style="color:#1d4ed8;margin-right:6px;"></i><span id="nav-name">...</span>
+    </span>
+    <a href="/logout" style="background:#fef2f2;border:1px solid #fecaca;color:#dc2626;padding:7px 16px;border-radius:8px;text-decoration:none;font-size:0.82rem;font-weight:600;">
+      <i class="fas fa-right-from-bracket mr-1"></i>Logout
+    </a>
+  </div>
+</nav>
+
+<!-- ── MAIN ── -->
+<div class="max-w-3xl mx-auto px-4 py-10">
+
+  <!-- Page title -->
+  <div style="text-align:center;margin-bottom:40px;">
+    <div style="display:inline-flex;align-items:center;gap:8px;background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;padding:6px 18px;border-radius:100px;font-size:0.68rem;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:20px;">
+      <span style="width:6px;height:6px;background:#16a34a;border-radius:50%;animation:pulse 2s infinite;display:inline-block;"></span>
+      Session 2025-26 · Applications Open
+    </div>
+    <h1 style="font-size:2.4rem;font-weight:900;color:#0f172a;letter-spacing:-1px;">Student Hostel Portal</h1>
+    <p style="color:#64748b;margin-top:10px;font-size:0.92rem;">Apply for accommodation or check your existing application status</p>
+  </div>
+
+  <!-- Tab selector -->
+  <div style="display:flex;gap:8px;margin-bottom:28px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:6px;">
+    <button class="tab-btn active" id="tab-apply" onclick="switchTab('apply')"><i class="fas fa-file-pen mr-2"></i>Apply for Hostel</button>
+    <button class="tab-btn" id="tab-status" onclick="switchTab('status')"><i class="fas fa-radar mr-2"></i>Track Application</button>
+    <button class="tab-btn" id="tab-complaint" onclick="switchTab('complaint')"><i class="fas fa-triangle-exclamation mr-2"></i>File Complaint</button>
+  </div>
+
+  <!-- ══ APPLICATION FORM PANEL ══ -->
+  <div id="panel-apply">
+
+    <!-- Progress -->
+    <div style="display:flex;align-items:center;margin-bottom:28px;padding:18px 24px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;">
+      <div class="p-step active" id="ps-1"><div class="p-dot">1</div><span class="hidden sm:inline">Personal</span></div>
+      <div class="p-line"></div>
+      <div class="p-step" id="ps-2"><div class="p-dot">2</div><span class="hidden sm:inline">Academic</span></div>
+      <div class="p-line"></div>
+      <div class="p-step" id="ps-3"><div class="p-dot">3</div><span class="hidden sm:inline">Room</span></div>
+      <div class="p-line"></div>
+      <div class="p-step" id="ps-4"><div class="p-dot">4</div><span class="hidden sm:inline">Guardian</span></div>
+    </div>
+
+    <!-- FORM -->
+    <form id="app-form" onsubmit="return false;">
+
+      <!-- ── SECTION 1: Personal Info ── -->
+      <div id="sec-1" class="form-card p-7 mb-6">
+        <div class="section-header">
+          <div class="section-icon" style="background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;"><i class="fas fa-user"></i></div>
+          <div>
+            <h3 style="font-size:1rem;font-weight:700;color:#0f172a;">Personal Information</h3>
+            <p style="font-size:0.78rem;color:#64748b;">Your basic contact and identity details</p>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div class="sm:col-span-2">
+            <label class="field-label">Full Name <span style="color:#ef4444;">*</span></label>
+            <input id="f-name" type="text" class="field-input" placeholder="e.g. Muhammad Ali Khan">
+          </div>
+          <div>
+            <label class="field-label">CNIC <span style="color:#ef4444;">*</span></label>
+            <input id="f-cnic" type="text" class="field-input" placeholder="35201-1234567-1" maxlength="15">
+          </div>
+          <div>
+            <label class="field-label">Phone Number <span style="color:#ef4444;">*</span></label>
+            <input id="f-phone" type="tel" class="field-input" placeholder="0300-1234567">
+          </div>
+          <div class="sm:col-span-2">
+            <label class="field-label">Email Address</label>
+            <input id="f-email" type="email" class="field-input" placeholder="student@uet.edu.pk">
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SECTION 2: Academic Info ── -->
+      <div id="sec-2" class="form-card p-7 mb-6">
+        <div class="section-header">
+          <div class="section-icon" style="background:#f5f3ff;border:1px solid #ddd6fe;color:#7c3aed;"><i class="fas fa-graduation-cap"></i></div>
+          <div>
+            <h3 style="font-size:1rem;font-weight:700;color:#0f172a;">Academic Information</h3>
+            <p style="font-size:0.78rem;color:#64748b;">Your university enrollment details</p>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div>
+            <label class="field-label">Registration Number <span style="color:#ef4444;">*</span></label>
+            <input id="f-reg" type="text" class="field-input" placeholder="e.g. 2022-CS-101">
+          </div>
+          <div>
+            <label class="field-label">Department</label>
+            <select id="f-dept" class="field-input">
+              <option value="">Select Department</option>
+              <option>Computer Science</option>
+              <option>Electrical Engineering</option>
+              <option>Mechanical Engineering</option>
+              <option>Civil Engineering</option>
+              <option>Chemical Engineering</option>
+              <option>Software Engineering</option>
+              <option>Mining Engineering</option>
+              <option>Metallurgy & Materials</option>
+              <option>Architecture</option>
+              <option>City & Regional Planning</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div>
+            <label class="field-label">Academic Year</label>
+            <select id="f-year" class="field-input">
+              <option value="">Select Year</option>
+              <option>1st Year</option>
+              <option>2nd Year</option>
+              <option>3rd Year</option>
+              <option>4th Year</option>
+              <option>5th Year</option>
+              <option>Masters</option>
+              <option>PhD</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SECTION 3: Room Preference ── -->
+      <div id="sec-3" class="form-card p-7 mb-6">
+        <div class="section-header">
+          <div class="section-icon" style="background:#f0fdf4;border:1px solid #bbf7d0;color:#16a34a;"><i class="fas fa-bed"></i></div>
+          <div>
+            <h3 style="font-size:1rem;font-weight:700;color:#0f172a;">Room Preference</h3>
+            <p style="font-size:0.78rem;color:#64748b;">Choose your preferred accommodation type</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+          <!-- Room type cards -->
+          <label style="cursor:pointer;">
+            <input type="radio" name="room_type" value="Single" style="display:none;" id="rt-single">
+            <div class="room-opt" data-for="rt-single" style="border:2px solid #e2e8f0;border-radius:12px;padding:16px;transition:all 0.2s;background:#fff;">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                <i class="fas fa-user" style="color:#1d4ed8;"></i>
+                <span style="font-weight:600;color:#0f172a;flex:1;">Single Room</span>
+                <span style="font-size:0.8rem;color:#1d4ed8;font-weight:700;">PKR 15,000/mo</span>
+              </div>
+              <p style="font-size:0.78rem;color:#64748b;">Private room · 1 student</p>
+            </div>
+          </label>
+          <label style="cursor:pointer;">
+            <input type="radio" name="room_type" value="Double" style="display:none;" id="rt-double">
+            <div class="room-opt" data-for="rt-double" style="border:2px solid #e2e8f0;border-radius:12px;padding:16px;transition:all 0.2s;background:#fff;">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                <i class="fas fa-user-group" style="color:#7c3aed;"></i>
+                <span style="font-weight:600;color:#0f172a;flex:1;">Double Room</span>
+                <span style="font-size:0.8rem;color:#7c3aed;font-weight:700;">PKR 10,000/mo</span>
+              </div>
+              <p style="font-size:0.78rem;color:#64748b;">Shared · 2 students</p>
+            </div>
+          </label>
+          <label style="cursor:pointer;">
+            <input type="radio" name="room_type" value="Triple" style="display:none;" id="rt-triple">
+            <div class="room-opt" data-for="rt-triple" style="border:2px solid #e2e8f0;border-radius:12px;padding:16px;transition:all 0.2s;background:#fff;">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                <i class="fas fa-users" style="color:#16a34a;"></i>
+                <span style="font-weight:600;color:#0f172a;flex:1;">Triple Room</span>
+                <span style="font-size:0.8rem;color:#16a34a;font-weight:700;">PKR 5,000/mo</span>
+              </div>
+              <p style="font-size:0.78rem;color:#64748b;">Shared · 3 students</p>
+            </div>
+          </label>
+          <label style="cursor:pointer;">
+            <input type="radio" name="room_type" value="Four Sharing" style="display:none;" id="rt-four" checked>
+            <div class="room-opt" data-for="rt-four" style="border:2px solid #e2e8f0;border-radius:12px;padding:16px;transition:all 0.2s;background:#fff;">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                <i class="fas fa-people-group" style="color:#d97706;"></i>
+                <span style="font-weight:600;color:#0f172a;flex:1;">Four Sharing</span>
+                <span style="font-size:0.8rem;color:#d97706;font-weight:700;">PKR 4,000/mo</span>
+              </div>
+              <p style="font-size:0.78rem;color:#64748b;">Shared · 4 students</p>
+            </div>
+          </label>
+        </div>
+
+        <label class="checkbox-label">
+          <input type="checkbox" id="f-ac">
+          <div class="checkbox-box"></div>
+          <span><i class="fas fa-snowflake" style="color:#1d4ed8;" class="mr-1"></i> AC Room — Add PKR 1,000/month</span>
+        </label>
+
+        <div style="margin-top:16px;">
+          <label class="field-label">Special Requirements</label>
+          <textarea id="f-special" class="field-input" rows="2" placeholder="Any medical conditions, special needs, or preferences…" style="resize:none;"></textarea>
+        </div>
+      </div>
+
+      <!-- ── SECTION 4: Guardian Info ── -->
+      <div id="sec-4" class="form-card p-7 mb-6">
+        <div class="section-header">
+          <div class="section-icon" style="background:#fffbeb;border:1px solid #fde68a;color:#d97706;"><i class="fas fa-person-shelter"></i></div>
+          <div>
+            <h3 style="font-size:1rem;font-weight:700;color:#0f172a;">Guardian Information</h3>
+            <p style="font-size:0.78rem;color:#64748b;">Emergency contact details</p>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div>
+            <label class="field-label">Guardian Name</label>
+            <input id="f-gname" type="text" class="field-input" placeholder="Father / Mother / Guardian name">
+          </div>
+          <div>
+            <label class="field-label">Guardian Phone</label>
+            <input id="f-gphone" type="tel" class="field-input" placeholder="0300-0000000">
+          </div>
+          <div>
+            <label class="field-label">Relation</label>
+            <select id="f-grel" class="field-input">
+              <option value="">Select Relation</option>
+              <option>Father</option>
+              <option>Mother</option>
+              <option>Brother</option>
+              <option>Uncle</option>
+              <option>Guardian</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Declaration -->
+      <div class="form-card p-5 mb-6" style="border-color:#bfdbfe;">
+        <label class="checkbox-label" id="declare-label">
+          <input type="checkbox" id="f-declare">
+          <div class="checkbox-box"></div>
+          <span>I declare that all information provided is accurate and I agree to abide by UET Hostel rules and regulations.</span>
+        </label>
+      </div>
+
+      <!-- Error message -->
+      <div id="form-error" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:12px 16px;margin-bottom:16px;color:#dc2626;font-size:0.85rem;"></div>
+
+      <button type="button" class="btn-submit" id="submit-btn" onclick="submitApplication()">
+        <i class="fas fa-paper-plane"></i> Submit Application
+      </button>
+    </form>
+
+    <!-- SUCCESS PANEL -->
+    <div id="success-panel" class="form-card p-8" style="display:none;text-align:center;">
+      <div class="success-icon"><i class="fas fa-check"></i></div>
+      <h2 style="font-size:1.8rem;font-weight:800;color:#0f172a;margin-bottom:10px;">Application Submitted!</h2>
+      <p style="color:#64748b;font-size:0.92rem;line-height:1.7;margin-bottom:24px;">Your hostel application has been received and is under review. Use the Application ID below to track your status.</p>
+
+      <div class="app-id-box">
+        <p style="font-size:0.7rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#64748b;margin-bottom:8px;">Your Application ID</p>
+        <div class="app-id" id="result-app-id">—</div>
+        <p style="font-size:0.75rem;color:#94a3b8;margin-top:8px;">Save this ID — you'll need it to check your status</p>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px;text-align:left;">
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px;">
+          <p style="font-size:0.7rem;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Name</p>
+          <p id="result-name" style="font-size:0.88rem;color:#0f172a;font-weight:600;">—</p>
+        </div>
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px;">
+          <p style="font-size:0.7rem;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Room Type</p>
+          <p id="result-room" style="font-size:0.88rem;color:#0f172a;font-weight:600;">—</p>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:8px;background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:12px 16px;margin-bottom:28px;text-align:left;">
+        <i class="fas fa-triangle-exclamation" style="color:#d97706;"></i>
+        <span style="font-size:0.82rem;color:#92400e;">You will be notified once the admin reviews your application.</span>
+      </div>
+
+      <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+        <button onclick="switchTab('status')" style="background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;padding:11px 24px;border-radius:10px;font-weight:600;font-size:0.85rem;cursor:pointer;font-family:inherit;transition:all 0.2s;" onmouseover="this.style.background='#dbeafe'" onmouseout="this.style.background='#eff6ff'">
+          <i class="fas fa-radar mr-2"></i>Track Status
+        </button>
+        <button onclick="resetForm()" style="background:#f8fafc;border:1px solid #e2e8f0;color:#64748b;padding:11px 24px;border-radius:10px;font-weight:600;font-size:0.85rem;cursor:pointer;font-family:inherit;transition:all 0.2s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='#f8fafc'">
+          <i class="fas fa-plus mr-2"></i>New Application
+        </button>
+      </div>
+    </div>
+
+  </div><!-- /panel-apply -->
+
+  <!-- ══ STATUS TRACKER PANEL ══ -->
+  <div id="panel-status" style="display:none;">
+    <div class="form-card p-7 mb-6">
+      <div class="section-header">
+        <div class="section-icon" style="background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;"><i class="fas fa-magnifying-glass"></i></div>
+        <div>
+          <h3 style="font-size:1rem;font-weight:700;color:#0f172a;">Track Your Application</h3>
+          <p style="font-size:0.78rem;color:#64748b;">Enter your Application ID to check current status</p>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <input id="track-id" type="text" class="field-input" placeholder="e.g. APP2F9A8B1C" style="flex:1;text-transform:uppercase;font-family:monospace;letter-spacing:1px;" oninput="this.value=this.value.toUpperCase()">
+        <button onclick="trackApplication()" style="background:linear-gradient(135deg,#1d4ed8,#3b82f6);color:white;border:none;border-radius:10px;padding:0 24px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;font-size:0.88rem;transition:all 0.2s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+          <i class="fas fa-search mr-2"></i>Check Status
+        </button>
+      </div>
+      <div id="track-error" style="display:none;margin-top:12px;color:#dc2626;font-size:0.83rem;"></div>
+
+      <!-- Result -->
+      <div id="track-result" class="lookup-result">
+        <div style="border-top:1px solid #e2e8f0;margin-top:20px;padding-top:20px;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px;">
+            <div>
+              <p style="font-size:0.7rem;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Applicant</p>
+              <p id="tr-name" style="font-size:1.1rem;font-weight:700;color:#0f172a;">—</p>
+              <p id="tr-id" style="font-size:0.78rem;color:#94a3b8;margin-top:2px;font-family:monospace;">—</p>
+            </div>
+            <div id="tr-status-badge"></div>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
+            <div class="status-card">
+              <p style="font-size:0.68rem;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Registration</p>
+              <p id="tr-reg" style="font-size:0.88rem;color:#0f172a;font-weight:600;">—</p>
+            </div>
+            <div class="status-card">
+              <p style="font-size:0.68rem;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Room Type</p>
+              <p id="tr-room" style="font-size:0.88rem;color:#0f172a;font-weight:600;">—</p>
+            </div>
+            <div class="status-card">
+              <p style="font-size:0.68rem;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Applied On</p>
+              <p id="tr-date" style="font-size:0.88rem;color:#0f172a;font-weight:600;">—</p>
+            </div>
+          </div>
+          <div id="tr-rejection-box" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:12px 16px;">
+            <p style="font-size:0.75rem;color:#dc2626;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Rejection Reason</p>
+            <p id="tr-reason" style="font-size:0.88rem;color:#b91c1c;">—</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Info cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:14px;padding:18px;text-align:center;">
+        <div style="width:40px;height:40px;background:rgba(245,158,11,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;color:#d97706;"><i class="fas fa-hourglass-half"></i></div>
+        <p style="font-size:0.82rem;font-weight:700;color:#d97706;">Pending</p>
+        <p style="font-size:0.75rem;color:#78716c;margin-top:4px;">Under review by admin</p>
+      </div>
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:14px;padding:18px;text-align:center;">
+        <div style="width:40px;height:40px;background:rgba(22,163,74,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;color:#16a34a;"><i class="fas fa-circle-check"></i></div>
+        <p style="font-size:0.82rem;font-weight:700;color:#16a34a;">Approved</p>
+        <p style="font-size:0.75rem;color:#4b7c5b;margin-top:4px;">Room assigned, report to hostel</p>
+      </div>
+      <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:14px;padding:18px;text-align:center;">
+        <div style="width:40px;height:40px;background:rgba(220,38,38,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;color:#dc2626;"><i class="fas fa-circle-xmark"></i></div>
+        <p style="font-size:0.82rem;font-weight:700;color:#dc2626;">Rejected</p>
+        <p style="font-size:0.75rem;color:#7f4a4a;margin-top:4px;">See reason and re-apply</p>
+      </div>
+    </div>
+  </div><!-- /panel-status -->
+
+  <!-- ══ COMPLAINT PANEL ══ -->
+  <div id="panel-complaint" style="display:none;">
+
+    <!-- Info notice -->
+    <div style="display:flex;align-items:flex-start;gap:12px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:14px;padding:16px 20px;margin-bottom:20px;">
+      <i class="fas fa-circle-info" style="color:#1d4ed8;margin-top:2px;flex-shrink:0;"></i>
+      <p style="font-size:0.84rem;color:#1e40af;line-height:1.6;">
+        Only <strong>approved students</strong> can file complaints. You need your <strong>Student ID</strong> (e.g. <code style="background:#dbeafe;padding:2px 6px;border-radius:4px;font-size:0.8rem;">STU0001</code>) which you receive once your application is approved by the admin.
+      </p>
+    </div>
+
+    <!-- Complaint Form -->
+    <div class="form-card p-7 mb-6" id="complaint-form-wrap">
+      <div class="section-header">
+        <div class="section-icon" style="background:#fef2f2;border:1px solid #fecaca;color:#dc2626;"><i class="fas fa-triangle-exclamation"></i></div>
+        <div>
+          <h3 style="font-size:1rem;font-weight:700;color:#0f172a;">File a Complaint</h3>
+          <p style="font-size:0.78rem;color:#64748b;">Report an issue to hostel management</p>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+        <div style="grid-column:1/-1;">
+          <label class="field-label">Your Student ID <span style="color:#ef4444;">*</span></label>
+          <input id="c-student-id" type="text" class="field-input" placeholder="e.g. STU0001" style="text-transform:uppercase;font-family:monospace;letter-spacing:1px;" oninput="this.value=this.value.toUpperCase()">
+        </div>
+        <div style="grid-column:1/-1;">
+          <label class="field-label">Complaint Category <span style="color:#ef4444;">*</span></label>
+          <select id="c-category" class="field-input">
+            <option value="">Select Category</option>
+            <option>Electricity</option>
+            <option>Plumbing</option>
+            <option>Noise</option>
+            <option>Cleanliness</option>
+            <option>Food</option>
+            <option>Security</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div style="grid-column:1/-1;">
+          <label class="field-label">Description <span style="color:#ef4444;">*</span></label>
+          <textarea id="c-description" class="field-input" rows="4" placeholder="Describe the issue in detail…" style="resize:none;"></textarea>
+        </div>
+      </div>
+
+      <!-- Error -->
+      <div id="c-error" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:12px 16px;margin-bottom:14px;color:#dc2626;font-size:0.85rem;"></div>
+
+      <button type="button" id="c-submit-btn" onclick="submitComplaint()" style="width:100%;padding:14px;background:linear-gradient(135deg,#dc2626,#ef4444);color:white;border:none;border-radius:12px;font-size:0.95rem;font-weight:700;font-family:inherit;cursor:pointer;transition:all 0.3s;display:flex;align-items:center;justify-content:center;gap:9px;box-shadow:0 4px 20px rgba(220,38,38,0.25);">
+        <i class="fas fa-paper-plane"></i> Submit Complaint
+      </button>
+    </div>
+
+    <!-- Success message -->
+    <div id="complaint-success" class="form-card p-8" style="display:none;text-align:center;">
+      <div style="width:72px;height:72px;border-radius:50%;background:#f0fdf4;border:2px solid #bbf7d0;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:1.8rem;color:#16a34a;animation:pop 0.4s ease;">
+        <i class="fas fa-check"></i>
+      </div>
+      <h3 style="font-size:1.4rem;font-weight:800;color:#0f172a;margin-bottom:8px;">Complaint Submitted!</h3>
+      <p style="color:#64748b;font-size:0.88rem;line-height:1.7;margin-bottom:24px;">Your complaint has been forwarded to hostel management. They will review and resolve it shortly.</p>
+      <button onclick="resetComplaint()" style="background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;padding:11px 28px;border-radius:10px;font-weight:600;font-size:0.88rem;cursor:pointer;font-family:inherit;">
+        <i class="fas fa-plus mr-2"></i>File Another Complaint
+      </button>
+    </div>
+
+    <!-- Info cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+      <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:14px;padding:16px;text-align:center;">
+        <i class="fas fa-bolt" style="color:#d97706;font-size:1.2rem;margin-bottom:8px;display:block;"></i>
+        <p style="font-size:0.78rem;font-weight:700;color:#d97706;">Electricity</p>
+        <p style="font-size:0.72rem;color:#78716c;margin-top:3px;">Power outage, fan, AC issues</p>
+      </div>
+      <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:14px;padding:16px;text-align:center;">
+        <i class="fas fa-droplet" style="color:#0369a1;font-size:1.2rem;margin-bottom:8px;display:block;"></i>
+        <p style="font-size:0.78rem;font-weight:700;color:#0369a1;">Plumbing</p>
+        <p style="font-size:0.72rem;color:#475569;margin-top:3px;">Water supply, leakage, sewage</p>
+      </div>
+      <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:14px;padding:16px;text-align:center;">
+        <i class="fas fa-shield-halved" style="color:#dc2626;font-size:1.2rem;margin-bottom:8px;display:block;"></i>
+        <p style="font-size:0.78rem;font-weight:700;color:#dc2626;">Security</p>
+        <p style="font-size:0.72rem;color:#7f4a4a;margin-top:3px;">Safety concerns, access issues</p>
+      </div>
+    </div>
+
+  </div><!-- /panel-complaint -->
+
+</div><!-- /main -->
+
+<script>
+// ── Load logged-in user name ───────────────────────────────────
+fetch('/api/me').then(r => r.json()).then(d => {
+  if (d.name) document.getElementById('nav-name').textContent = d.name;
+}).catch(() => {});
+
+// ── Tab switching ──────────────────────────────────────────────
+function switchTab(tab) {
+  document.getElementById('panel-apply').style.display     = tab === 'apply'     ? 'block' : 'none';
+  document.getElementById('panel-status').style.display    = tab === 'status'    ? 'block' : 'none';
+  document.getElementById('panel-complaint').style.display = tab === 'complaint' ? 'block' : 'none';
+  document.getElementById('tab-apply').classList.toggle('active',     tab === 'apply');
+  document.getElementById('tab-status').classList.toggle('active',    tab === 'status');
+  document.getElementById('tab-complaint').classList.toggle('active', tab === 'complaint');
+}
+
+// ── Room type selection visual ─────────────────────────────────
+document.querySelectorAll('input[name=room_type]').forEach(radio => {
+  radio.addEventListener('change', () => {
+    document.querySelectorAll('.room-opt').forEach(el => {
+      el.style.borderColor = '#e2e8f0';
+      el.style.background  = '#ffffff';
+    });
+    const opt = document.querySelector(`.room-opt[data-for="${radio.id}"]`);
+    if (opt) {
+      opt.style.borderColor = '#1d4ed8';
+      opt.style.background  = '#eff6ff';
+    }
+  });
+});
+
+// ── Progress steps ─────────────────────────────────────────────
+function updateProgress() {
+  const sections = ['sec-1','sec-2','sec-3','sec-4'];
+  const steps    = ['ps-1','ps-2','ps-3','ps-4'];
+  const offsets  = sections.map(id => {
+    const el = document.getElementById(id);
+    return el ? el.getBoundingClientRect().top : 999;
+  });
+  let active = 0;
+  offsets.forEach((top, i) => { if (top < window.innerHeight * 0.6) active = i; });
+  steps.forEach((id, i) => {
+    const el = document.getElementById(id);
+    el.classList.remove('done','active');
+    if (i < active) el.classList.add('done');
+    else if (i === active) el.classList.add('active');
+  });
+}
+window.addEventListener('scroll', updateProgress);
+
+// ── Submit application ─────────────────────────────────────────
+async function submitApplication() {
+  const errEl = document.getElementById('form-error');
+  errEl.style.display = 'none';
+
+  const name   = document.getElementById('f-name').value.trim();
+  const cnic   = document.getElementById('f-cnic').value.trim();
+  const phone  = document.getElementById('f-phone').value.trim();
+  const reg    = document.getElementById('f-reg').value.trim();
+  const declared = document.getElementById('f-declare').checked;
+
+  if (!name)     { showError('Full name is required.'); return; }
+  if (!cnic)     { showError('CNIC is required.'); return; }
+  if (!phone)    { showError('Phone number is required.'); return; }
+  if (!reg)      { showError('Registration number is required.'); return; }
+  if (!declared) { showError('Please accept the declaration to proceed.'); return; }
+
+  const roomType = document.querySelector('input[name=room_type]:checked')?.value || 'Four Sharing';
+
+  const payload = {
+    name,
+    cnic,
+    phone,
+    registration_number: reg,
+    email:               document.getElementById('f-email').value.trim(),
+    department:          document.getElementById('f-dept').value,
+    year:                document.getElementById('f-year').value,
+    room_type:           roomType,
+    ac:                  document.getElementById('f-ac').checked,
+    guardian_name:       document.getElementById('f-gname').value.trim(),
+    guardian_phone:      document.getElementById('f-gphone').value.trim(),
+    guardian_relation:   document.getElementById('f-grel').value,
+    special_requirements: document.getElementById('f-special').value.trim(),
+  };
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting…';
+
+  try {
+    const res  = await fetch('/api/applications', {
+      method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) throw new Error(data.error || 'Submission failed');
+
+    // Show success
+    document.getElementById('app-form').style.display      = 'none';
+    document.getElementById('success-panel').style.display = 'block';
+    document.getElementById('result-app-id').textContent   = data.app_id;
+    document.getElementById('result-name').textContent     = name;
+    document.getElementById('result-room').textContent     = roomType + (payload.ac ? ' + AC' : '');
+
+  } catch(e) {
+    showError(e.message || 'Could not submit. Make sure the server is running.');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Application';
+  }
+}
+
+function showError(msg) {
+  const el = document.getElementById('form-error');
+  el.textContent = '⚠ ' + msg;
+  el.style.display = 'block';
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function resetForm() {
+  document.getElementById('app-form').reset();
+  document.getElementById('app-form').style.display      = 'block';
+  document.getElementById('success-panel').style.display = 'none';
+  document.querySelectorAll('.room-opt').forEach(el => {
+    el.style.borderColor = '#e2e8f0';
+    el.style.background  = '#ffffff';
+  });
+}
+
+// ── Track application ──────────────────────────────────────────
+async function trackApplication() {
+  const id  = document.getElementById('track-id').value.trim().toUpperCase();
+  const err = document.getElementById('track-error');
+  const res_div = document.getElementById('track-result');
+  err.style.display = 'none';
+  res_div.style.display = 'none';
+
+  if (!id) { err.textContent = 'Please enter your Application ID.'; err.style.display='block'; return; }
+
+  try {
+    const res  = await fetch(`/api/applications/${id}/status`);
+    const data = await res.json();
+    if (!res.ok || !data.success) throw new Error(data.error || 'Not found');
+    const a = data.application;
+
+    document.getElementById('tr-name').textContent = a.name;
+    document.getElementById('tr-id').textContent   = a.id;
+    document.getElementById('tr-reg').textContent  = a.registration_number || '—';
+    document.getElementById('tr-room').textContent = a.room_type + (a.ac ? ' + AC' : '');
+    document.getElementById('tr-date').textContent = (a.created_at || '').split(' ')[0];
+
+    const badgeEl = document.getElementById('tr-status-badge');
+    const cls = a.status === 'Approved' ? 'status-approved' : a.status === 'Rejected' ? 'status-rejected' : 'status-pending';
+    const icon = a.status === 'Approved' ? 'fa-circle-check' : a.status === 'Rejected' ? 'fa-circle-xmark' : 'fa-hourglass-half';
+    badgeEl.innerHTML = `<span class="status-badge ${cls}"><i class="fas ${icon}"></i> ${a.status}</span>`;
+
+    const rbox = document.getElementById('tr-rejection-box');
+    if (a.status === 'Rejected' && a.rejection_reason) {
+      document.getElementById('tr-reason').textContent = a.rejection_reason;
+      rbox.style.display = 'block';
+    } else {
+      rbox.style.display = 'none';
+    }
+
+    res_div.style.display = 'block';
+  } catch(e) {
+    err.textContent = '⚠ ' + (e.message || 'Application not found. Check your ID and try again.');
+    err.style.display = 'block';
+  }
+}
+
+// Allow Enter key in track input
+document.getElementById('track-id')?.addEventListener('keydown', e => {
+  if (e.key === 'Enter') trackApplication();
+});
+
+// ── Submit complaint ───────────────────────────────────────────
+async function submitComplaint() {
+  const errEl = document.getElementById('c-error');
+  errEl.style.display = 'none';
+
+  const studentId  = document.getElementById('c-student-id').value.trim().toUpperCase();
+  const category   = document.getElementById('c-category').value;
+  const description = document.getElementById('c-description').value.trim();
+
+  if (!studentId)   { showCError('Student ID is required.'); return; }
+  if (!category)    { showCError('Please select a complaint category.'); return; }
+  if (!description) { showCError('Please describe the issue.'); return; }
+
+  const btn = document.getElementById('c-submit-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting…';
+
+  try {
+    const res  = await fetch('/api/complaints', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ student_id: studentId, category, description })
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) throw new Error(data.error || 'Submission failed');
+
+    document.getElementById('complaint-form-wrap').style.display = 'none';
+    document.getElementById('complaint-success').style.display   = 'block';
+  } catch(e) {
+    const msg = e.message.includes('not found') || e.message.includes('Student')
+      ? 'Student ID not found. Make sure your application is approved and you have a valid Student ID.'
+      : (e.message || 'Could not submit. Make sure the server is running.');
+    showCError(msg);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Complaint';
+  }
+}
+
+function showCError(msg) {
+  const el = document.getElementById('c-error');
+  el.textContent = '⚠ ' + msg;
+  el.style.display = 'block';
+}
+
+function resetComplaint() {
+  document.getElementById('c-student-id').value   = '';
+  document.getElementById('c-category').value     = '';
+  document.getElementById('c-description').value  = '';
+  document.getElementById('c-error').style.display = 'none';
+  document.getElementById('complaint-form-wrap').style.display = 'block';
+  document.getElementById('complaint-success').style.display   = 'none';
+}
+</script>
+</body>
+</html>

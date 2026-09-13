@@ -1,0 +1,23 @@
+[
+  {
+    "id": "COMDEMO001",
+    "student_id": "STU0001",
+    "student_name": "Areeba Khan",
+    "room_number": "101",
+    "category": "Electricity",
+    "description": "Study light needs repair.",
+    "status": "Pending",
+    "created_at": "2026-09-02 16:30:00"
+  },
+  {
+    "id": "COMDEMO002",
+    "student_id": "STU0002",
+    "student_name": "Hira Malik",
+    "room_number": "102",
+    "category": "Plumbing",
+    "description": "Bathroom tap needs maintenance.",
+    "status": "Resolved",
+    "created_at": "2026-08-25 13:10:00",
+    "resolved_at": "2026-08-26 09:00:00"
+  }
+]

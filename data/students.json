@@ -1,0 +1,35 @@
+[
+  {
+    "student_id": "STU0001",
+    "name": "Areeba Khan",
+    "registration_number": "2026-SE-101",
+    "phone": "0300-1112233",
+    "room_number": "101",
+    "room_type": "Double",
+    "ac": false,
+    "fee": 10000,
+    "created_at": "2026-08-20 10:30:00"
+  },
+  {
+    "student_id": "STU0002",
+    "name": "Hira Malik",
+    "registration_number": "2026-CS-102",
+    "phone": "0300-2223344",
+    "room_number": "102",
+    "room_type": "Single",
+    "ac": true,
+    "fee": 16000,
+    "created_at": "2026-08-21 11:15:00"
+  },
+  {
+    "student_id": "STU0003",
+    "name": "Sara Ahmed",
+    "registration_number": "2026-IT-103",
+    "phone": "0300-3334455",
+    "room_number": "201",
+    "room_type": "Triple",
+    "ac": false,
+    "fee": 5000,
+    "created_at": "2026-08-22 09:45:00"
+  }
+]

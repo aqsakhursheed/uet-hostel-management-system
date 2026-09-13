@@ -1,0 +1,40 @@
+[
+  {
+    "id": "APPDEMO001",
+    "name": "Maham Ali",
+    "cnic": "35202-1234567-8",
+    "registration_number": "2026-SE-104",
+    "phone": "0300-4445566",
+    "email": "maham@example.com",
+    "department": "Software Engineering",
+    "year": "1st Year",
+    "room_type": "Four Sharing",
+    "ac": false,
+    "guardian_name": "Usman Ali",
+    "guardian_phone": "0300-5556677",
+    "guardian_relation": "Father",
+    "special_requirements": "None",
+    "status": "Pending",
+    "created_at": "2026-09-01 12:00:00"
+  },
+  {
+    "id": "APPDEMO002",
+    "name": "Noor Fatima",
+    "cnic": "35202-7654321-0",
+    "registration_number": "2026-CS-105",
+    "phone": "0300-6667788",
+    "email": "noor@example.com",
+    "department": "Computer Science",
+    "year": "1st Year",
+    "room_type": "Double",
+    "ac": true,
+    "guardian_name": "Kashif Fatima",
+    "guardian_phone": "0300-7778899",
+    "guardian_relation": "Father",
+    "special_requirements": "None",
+    "status": "Rejected",
+    "rejection_reason": "Demo application: room capacity unavailable.",
+    "created_at": "2026-08-28 14:20:00",
+    "rejected_at": "2026-08-29 10:00:00"
+  }
+]

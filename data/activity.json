@@ -1,0 +1,14 @@
+[
+  {
+    "id": "ACTDEMO002",
+    "action": "Demo Data Loaded",
+    "details": "Fictional hostel records are ready for demonstration.",
+    "timestamp": "2026-09-01 09:00:00"
+  },
+  {
+    "id": "ACTDEMO001",
+    "action": "System Ready",
+    "details": "UET Hostel Management System initialized.",
+    "timestamp": "2026-08-20 09:00:00"
+  }
+]

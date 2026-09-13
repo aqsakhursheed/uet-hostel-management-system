@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>UET Hostel | Admin Dashboard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+body { font-family: 'Inter', sans-serif; }
+
+.nav-item.active {
+  background: rgba(139,92,246,.15);
+  color: white;
+  border-right: 2px solid #8b5cf6;
+}
+.nav-item { transition: all .25s ease; }
+.nav-item:hover { transform: translateX(4px); }
+
+.dashboard-card {
+  position: relative; overflow: hidden;
+  transition: all .3s ease; backdrop-filter: blur(10px);
+}
+.dashboard-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px rgba(139,92,246,.18);
+  border-color: rgba(139,92,246,.35);
+}
+.dashboard-icon {
+  width:48px; height:48px; border-radius:14px;
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(139,92,246,.15); color:#a78bfa; font-size:18px;
+}
+.input-field {
+  background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1);
+  border-radius:12px; padding:12px 14px; width:100%; color:white;
+  outline:none; transition:.25s ease;
+}
+.input-field:focus { border-color:#8b5cf6; box-shadow:0 0 0 4px rgba(139,92,246,.15); }
+.input-field option { background:#1e1b4b; }
+
+.btn-primary { background:linear-gradient(135deg,#8b5cf6,#6366f1); transition:.25s ease; }
+.btn-primary:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(139,92,246,.4); }
+.btn-secondary { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08); transition:.25s ease; }
+.btn-secondary:hover { background:rgba(255,255,255,.1); }
+
+.custom-scrollbar::-webkit-scrollbar { width:8px; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background:rgba(139,92,246,.4); border-radius:20px; }
+
+.modal-animation { animation:modalFade .25s ease; }
+@keyframes modalFade {
+  from { opacity:0; transform:translateY(20px) scale(.98); }
+  to   { opacity:1; transform:translateY(0) scale(1); }
+}
+.toast { animation:toastIn .3s ease; }
+@keyframes toastIn {
+  from { opacity:0; transform:translateX(100px); }
+  to   { opacity:1; transform:translateX(0); }
+}
+.loading-btn { opacity:.7; pointer-events:none; }
+.empty-state {
+  padding:40px 20px; text-align:center;
+  border:1px dashed rgba(255,255,255,.1); border-radius:20px;
+}
+
+/* table rows */
+.data-row { transition:background .2s; }
+.data-row:hover { background:rgba(255,255,255,.04); }
+
+/* badge */
+.badge-paid    { background:rgba(34,197,94,.12);  color:#16a34a; border:1px solid rgba(34,197,94,.25);  }
+.badge-unpaid  { background:rgba(220,38,38,.08);  color:#dc2626; border:1px solid rgba(220,38,38,.2);   }
+.badge-pending { background:rgba(245,158,11,.1);  color:#d97706; border:1px solid rgba(245,158,11,.25); }
+.badge-resolved{ background:rgba(34,197,94,.12);  color:#16a34a; border:1px solid rgba(34,197,94,.25);  }
+
+/* ═══════════════════════════════════════
+   LIGHT THEME OVERRIDES
+═══════════════════════════════════════ */
+
+/* ─ Structural ─ */
+body   { background:#f5f7fa !important; color:#0f172a !important; }
+aside  { background:#ffffff !important; border-right-color:#e2e8f0 !important; }
+header { background:rgba(255,255,255,0.96) !important; border-bottom-color:#e2e8f0 !important; }
+
+/* ─ Tailwind bg overrides ─ */
+.bg-slate-950  { background:#f5f7fa !important; }
+.bg-slate-900  { background:#ffffff !important; }
+.bg-slate-800  { background:#f8fafc !important; }
+.bg-slate-700  { background:#e2e8f0 !important; }
+.bg-slate-950\/90 { background:rgba(255,255,255,0.96) !important; }
+
+/* ─ Tailwind text overrides ─ */
+.text-slate-200 { color:#1e293b !important; }
+.text-slate-300 { color:#334155 !important; }
+.text-slate-400 { color:#64748b !important; }
+.text-slate-500 { color:#94a3b8 !important; }
+.text-slate-600 { color:#94a3b8 !important; }
+
+/* ─ Tailwind border/bg opacity overrides ─ */
+.border-white\/5  { border-color:#e2e8f0 !important; }
+.border-white\/10 { border-color:#e2e8f0 !important; }
+.bg-white\/5      { background:#f8fafc  !important; }
+
+/* ─ Tailwind hover overrides ─ */
+.hover\:bg-white\/5:hover  { background:#f1f5f9 !important; }
+.hover\:bg-white\/10:hover { background:#e2e8f0 !important; }
+
+/* ─ Nav ─ */
+.nav-item { color:#64748b !important; }
+.nav-item:hover { background:#f1f5f9 !important; }
+.nav-item.active {
+  background:rgba(29,78,216,.1) !important;
+  color:#1d4ed8 !important;
+  border-right:2px solid #1d4ed8 !important;
+}
+
+/* ─ Dashboard ─ */
+.dashboard-icon { background:rgba(29,78,216,.08) !important; color:#1d4ed8 !important; }
+.dashboard-card:hover {
+  box-shadow:0 10px 30px rgba(29,78,216,.1) !important;
+  border-color:rgba(29,78,216,.2) !important;
+}
+
+/* ─ Inputs ─ */
+.input-field {
+  background:#f8fafc !important; border:1.5px solid #e2e8f0 !important;
+  color:#0f172a !important;
+}
+.input-field:focus {
+  border-color:#1d4ed8 !important;
+  box-shadow:0 0 0 3px rgba(29,78,216,.1) !important;
+  background:#ffffff !important;
+}
+.input-field option { background:#ffffff !important; color:#0f172a !important; }
+.input-field::placeholder { color:#c1c9d6 !important; }
+
+/* ─ Buttons ─ */
+.btn-primary { background:linear-gradient(135deg,#1d4ed8,#3b82f6) !important; }
+.btn-primary:hover { box-shadow:0 6px 20px rgba(29,78,216,.4) !important; }
+.btn-secondary {
+  background:#f8fafc !important; border:1px solid #e2e8f0 !important;
+  color:#475569 !important;
+}
+.btn-secondary:hover { background:#f1f5f9 !important; }
+
+/* ─ Table rows ─ */
+.data-row:hover { background:#f8fafc !important; }
+
+/* ─ Modal ─ */
+#modal-box { background:#ffffff !important; border-color:#e2e8f0 !important; }
+
+/* ─ Toast ─ */
+.toast { background:#ffffff !important; color:#0f172a !important; }
+
+/* ─ Empty state ─ */
+.empty-state { border-color:#e2e8f0 !important; color:#94a3b8 !important; }
+
+/* ─ Scrollbar ─ */
+.custom-scrollbar::-webkit-scrollbar-track { background:#f1f5f9; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background:rgba(29,78,216,.2) !important; }
+
+/* ─ Search dropdown ─ */
+#search-dropdown { background:#ffffff !important; border-color:#e2e8f0 !important; }
+#search-dropdown > div:hover { background:#f1f5f9 !important; }
+#search-dropdown > div { border-bottom-color:#f1f5f9 !important; }
+
+/* ─ Purple → Blue accent swap ─ */
+.text-purple-400 { color:#1d4ed8 !important; }
+.ring-purple-500\/40 { --tw-ring-color:rgba(29,78,216,0.4) !important; }
+.peer:checked ~ .peer-checked\:bg-purple-600 { background:#1d4ed8 !important; }
+
+/* ─ Sidebar logo gradient → blue ─ */
+.from-purple-500 { --tw-gradient-from:#1d4ed8 !important; }
+.to-indigo-500   { --tw-gradient-to:#3b82f6   !important; }
+</style>
+</head>
+
+<body class="bg-slate-950 text-slate-200 overflow-hidden">
+
+<div id="toast-container" class="fixed top-5 right-5 z-[9999] space-y-3"></div>
+
+<div class="flex h-screen overflow-hidden">
+
+<!-- ═══════════════════ SIDEBAR ═══════════════════ -->
+<aside class="w-64 bg-slate-900 border-r border-white/5 hidden lg:flex flex-col fixed h-full z-50">
+  <div class="p-6 border-b border-white/5">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 flex items-center justify-center">
+        <i class="fas fa-layer-group text-white"></i>
+      </div>
+      <div>
+        <h1 id="hostel-name-sidebar" class="font-bold text-lg">UET Hostel</h1>
+        <p class="text-xs text-slate-500">Admin Dashboard</p>
+      </div>
+    </div>
+  </div>
+
+  <nav class="flex-1 p-3 overflow-y-auto custom-scrollbar">
+    <ul class="space-y-1">
+      <li><div class="nav-item active flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer" data-tab="dashboard"><i class="fas fa-home"></i><span>Dashboard</span></div></li>
+      <li><div class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer text-slate-400 hover:bg-white/5" data-tab="students"><i class="fas fa-users"></i><span>Students</span></div></li>
+      <li><div class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer text-slate-400 hover:bg-white/5" data-tab="rooms"><i class="fas fa-bed"></i><span>Rooms</span></div></li>
+      <li><div class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer text-slate-400 hover:bg-white/5" data-tab="payments"><i class="fas fa-money-bill-wave"></i><span>Payments</span></div></li>
+      <li><div class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer text-slate-400 hover:bg-white/5" data-tab="complaints"><i class="fas fa-triangle-exclamation"></i><span>Complaints</span></div></li>
+      <li><div class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer text-slate-400 hover:bg-white/5" data-tab="staff"><i class="fas fa-user-tie"></i><span>Staff</span></div></li>
+      <li><div class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer text-slate-400 hover:bg-white/5" data-tab="applications"><i class="fas fa-file-lines"></i><span>Applications</span><span id="app-badge" class="ml-auto hidden text-xs bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded-full font-bold">0</span></div></li>
+      <li><div class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer text-slate-400 hover:bg-white/5" data-tab="settings"><i class="fas fa-gear"></i><span>Settings</span></div></li>
+    </ul>
+  </nav>
+</aside>
+
+<!-- ═══════════════════ MAIN ═══════════════════ -->
+<main class="flex-1 lg:ml-64 overflow-y-auto custom-scrollbar h-screen">
+
+  <!-- header -->
+  <header class="sticky top-0 z-40 h-16 bg-slate-950/90 backdrop-blur border-b border-white/5 px-6 flex items-center justify-between">
+    <div class="relative w-80 max-w-full">
+      <input id="global-search" type="text" placeholder="Search students, staff…" class="input-field pl-11 py-3 text-sm" autocomplete="off">
+      <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"></i>
+      <div id="search-dropdown" class="hidden absolute top-full left-0 right-0 mt-2 bg-slate-800 border border-white/10 rounded-2xl overflow-hidden shadow-2xl z-50"></div>
+    </div>
+    <div class="flex items-center gap-3">
+      <a href="/" title="Back to Home" class="w-10 h-10 rounded-full flex items-center justify-center cursor-pointer transition text-slate-400 hover:text-blue-600" style="background:#f1f5f9;border:1px solid #e2e8f0;text-decoration:none;">
+        <i class="fas fa-house text-sm"></i>
+      </a>
+      <a href="/logout" title="Logout" class="w-10 h-10 rounded-full flex items-center justify-center cursor-pointer transition text-slate-400 hover:text-red-500" style="background:#f1f5f9;border:1px solid #e2e8f0;text-decoration:none;">
+        <i class="fas fa-right-from-bracket text-sm"></i>
+      </a>
+    </div>
+  </header>
+
+  <div class="p-6 space-y-6">
+
+    <!-- ══════════ DASHBOARD ══════════ -->
+    <section id="tab-dashboard" class="tab-section space-y-6">
+      <div>
+        <h2 class="text-3xl font-bold">Dashboard</h2>
+        <p class="text-slate-500 mt-1">Overview of hostel management statistics</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-5">
+        <div class="dashboard-card bg-slate-900 border border-white/5 rounded-2xl p-5 flex items-center justify-between">
+          <div><p class="text-xs uppercase tracking-widest text-slate-500">Students</p><h3 id="stat-students" class="text-3xl font-bold mt-2">—</h3></div>
+          <div class="dashboard-icon"><i class="fas fa-users"></i></div>
+        </div>
+        <div class="dashboard-card bg-slate-900 border border-white/5 rounded-2xl p-5 flex items-center justify-between">
+          <div><p class="text-xs uppercase tracking-widest text-slate-500">Rooms</p><h3 id="stat-rooms" class="text-3xl font-bold mt-2">—</h3></div>
+          <div class="dashboard-icon"><i class="fas fa-bed"></i></div>
+        </div>
+        <div class="dashboard-card bg-slate-900 border border-white/5 rounded-2xl p-5 flex items-center justify-between">
+          <div><p class="text-xs uppercase tracking-widest text-slate-500">Pending Payments</p><h3 id="stat-payments" class="text-3xl font-bold mt-2">—</h3></div>
+          <div class="dashboard-icon"><i class="fas fa-wallet"></i></div>
+        </div>
+        <div class="dashboard-card bg-slate-900 border border-white/5 rounded-2xl p-5 flex items-center justify-between">
+          <div><p class="text-xs uppercase tracking-widest text-slate-500">Complaints</p><h3 id="stat-complaints" class="text-3xl font-bold mt-2">—</h3></div>
+          <div class="dashboard-icon"><i class="fas fa-circle-exclamation"></i></div>
+        </div>
+        <div class="dashboard-card bg-slate-900 border border-amber-500/10 rounded-2xl p-5 flex items-center justify-between cursor-pointer" onclick="switchTab('applications')">
+          <div><p class="text-xs uppercase tracking-widest text-slate-500">Applications</p><h3 id="stat-applications" class="text-3xl font-bold mt-2">—</h3></div>
+          <div class="dashboard-icon" style="background:rgba(245,158,11,0.12);color:#fbbf24;"><i class="fas fa-file-lines"></i></div>
+        </div>
+      </div>
+
+      <div class="bg-slate-900 border border-white/5 rounded-2xl p-6">
+        <div class="flex items-center justify-between mb-5">
+          <h3 class="font-semibold text-lg flex items-center gap-3">
+            <i class="fas fa-clock-rotate-left text-purple-400"></i> Recent Activity
+          </h3>
+          <button onclick="loadDashboard()" class="text-xs text-slate-500 hover:text-purple-400 transition">
+            <i class="fas fa-rotate-right mr-1"></i>Refresh
+          </button>
+        </div>
+        <div id="activity-list" class="space-y-3"></div>
+      </div>
+    </section>
+
+    <!-- ══════════ STUDENTS ══════════ -->
+    <section id="tab-students" class="tab-section hidden space-y-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-3xl font-bold">Students</h2>
+          <p class="text-slate-500 mt-1">Manage hostel student records</p>
+        </div>
+        <button onclick="openAddStudentModal()" class="btn-primary px-5 py-3 rounded-xl text-sm flex items-center gap-2">
+          <i class="fas fa-plus"></i> Add Student
+        </button>
+      </div>
+
+      <div class="relative">
+        <input id="student-search" type="text" placeholder="Search by name, ID, room…" class="input-field pl-11">
+        <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"></i>
+      </div>
+
+      <div class="bg-slate-900 border border-white/5 rounded-2xl overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b border-white/5 text-slate-500 text-xs uppercase tracking-widest">
+                <th class="px-5 py-4 text-left">Student</th>
+                <th class="px-5 py-4 text-left">Reg No.</th>
+                <th class="px-5 py-4 text-left">Room</th>
+                <th class="px-5 py-4 text-left">Type</th>
+                <th class="px-5 py-4 text-left">Fee (PKR)</th>
+                <th class="px-5 py-4 text-left">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="students-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ ROOMS ══════════ -->
+    <section id="tab-rooms" class="tab-section hidden space-y-6">
+      <div>
+        <h2 class="text-3xl font-bold">Rooms</h2>
+        <p class="text-slate-500 mt-1">View occupied rooms and allocations</p>
+      </div>
+      <div id="rooms-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5"></div>
+    </section>
+
+    <!-- ══════════ PAYMENTS ══════════ -->
+    <section id="tab-payments" class="tab-section hidden space-y-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-3xl font-bold">Payments</h2>
+          <p class="text-slate-500 mt-1">Track and manage fee payments</p>
+        </div>
+        <div class="flex gap-2">
+          <select id="payment-filter" class="input-field w-auto" onchange="renderPayments()">
+            <option value="all">All</option>
+            <option value="Unpaid">Unpaid</option>
+            <option value="Paid">Paid</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="bg-slate-900 border border-white/5 rounded-2xl overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b border-white/5 text-slate-500 text-xs uppercase tracking-widest">
+                <th class="px-5 py-4 text-left">Student</th>
+                <th class="px-5 py-4 text-left">Amount (PKR)</th>
+                <th class="px-5 py-4 text-left">Status</th>
+                <th class="px-5 py-4 text-left">Date</th>
+                <th class="px-5 py-4 text-left">Action</th>
+              </tr>
+            </thead>
+            <tbody id="payments-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ COMPLAINTS ══════════ -->
+    <section id="tab-complaints" class="tab-section hidden space-y-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-3xl font-bold">Complaints</h2>
+          <p class="text-slate-500 mt-1">Track and resolve student complaints</p>
+        </div>
+        <button onclick="openAddComplaintModal()" class="btn-primary px-5 py-3 rounded-xl text-sm flex items-center gap-2">
+          <i class="fas fa-plus"></i> File Complaint
+        </button>
+      </div>
+
+      <div id="complaints-list" class="space-y-4"></div>
+    </section>
+
+    <!-- ══════════ STAFF ══════════ -->
+    <section id="tab-staff" class="tab-section hidden space-y-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-3xl font-bold">Staff</h2>
+          <p class="text-slate-500 mt-1">Manage hostel staff records</p>
+        </div>
+        <button onclick="openAddStaffModal()" class="btn-primary px-5 py-3 rounded-xl text-sm flex items-center gap-2">
+          <i class="fas fa-plus"></i> Add Staff
+        </button>
+      </div>
+
+      <div class="bg-slate-900 border border-white/5 rounded-2xl overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b border-white/5 text-slate-500 text-xs uppercase tracking-widest">
+                <th class="px-5 py-4 text-left">Name</th>
+                <th class="px-5 py-4 text-left">ID</th>
+                <th class="px-5 py-4 text-left">Category</th>
+                <th class="px-5 py-4 text-left">Phone</th>
+                <th class="px-5 py-4 text-left">Salary (PKR)</th>
+                <th class="px-5 py-4 text-left">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="staff-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ APPLICATIONS ══════════ -->
+    <section id="tab-applications" class="tab-section hidden space-y-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-3xl font-bold">Applications</h2>
+          <p class="text-slate-500 mt-1">Review and process hostel admission applications</p>
+        </div>
+        <div class="flex gap-2">
+          <select id="app-filter" class="input-field w-auto" onchange="renderApplications()">
+            <option value="all">All</option>
+            <option value="Pending">Pending</option>
+            <option value="Approved">Approved</option>
+            <option value="Rejected">Rejected</option>
+          </select>
+        </div>
+      </div>
+      <div id="applications-list" class="space-y-4"></div>
+    </section>
+
+    <!-- ══════════ SETTINGS ══════════ -->
+    <section id="tab-settings" class="tab-section hidden space-y-6">
+      <div>
+        <h2 class="text-3xl font-bold">Settings</h2>
+        <p class="text-slate-500 mt-1">Manage hostel configuration and records</p>
+      </div>
+
+      <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+
+        <!-- room prices -->
+        <div class="bg-slate-900 border border-white/5 rounded-2xl p-6 space-y-4">
+          <h3 class="font-semibold text-lg">Room Prices (PKR/month)</h3>
+          <div class="space-y-3" id="room-price-fields">
+            <div class="grid grid-cols-2 gap-3 items-center">
+              <span class="text-slate-400 text-sm">Single</span>
+              <input type="number" id="price-Single" class="input-field" placeholder="15000">
+            </div>
+            <div class="grid grid-cols-2 gap-3 items-center">
+              <span class="text-slate-400 text-sm">Double</span>
+              <input type="number" id="price-Double" class="input-field" placeholder="10000">
+            </div>
+            <div class="grid grid-cols-2 gap-3 items-center">
+              <span class="text-slate-400 text-sm">Triple</span>
+              <input type="number" id="price-Triple" class="input-field" placeholder="5000">
+            </div>
+            <div class="grid grid-cols-2 gap-3 items-center">
+              <span class="text-slate-400 text-sm">Four Sharing</span>
+              <input type="number" id="price-FourSharing" class="input-field" placeholder="4000">
+            </div>
+            <div class="grid grid-cols-2 gap-3 items-center">
+              <span class="text-slate-400 text-sm">AC Add-on</span>
+              <input type="number" id="price-ac_addon" class="input-field" placeholder="1000">
+            </div>
+          </div>
+          <button onclick="savePrices()" class="btn-primary w-full py-3 rounded-xl text-sm mt-2">Save Prices</button>
+        </div>
+
+        <!-- general settings -->
+        <div class="bg-slate-900 border border-white/5 rounded-2xl p-6 space-y-5">
+          <h3 class="font-semibold text-lg">General Settings</h3>
+          <div>
+            <label class="text-xs uppercase tracking-widest text-slate-500">Hostel Name</label>
+            <input type="text" id="setting-hostel-name" class="input-field mt-2" placeholder="UET Hostel">
+          </div>
+          <div>
+            <label class="text-xs uppercase tracking-widest text-slate-500">Admin Profile</label>
+            <input type="text" id="setting-admin-name" class="input-field mt-2" placeholder="Admin">
+          </div>
+          <div class="flex items-center justify-between bg-white/5 rounded-xl p-4">
+            <span>Notifications</span>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="setting-notifications" class="sr-only peer">
+              <div class="w-11 h-6 bg-slate-700 rounded-full peer peer-checked:bg-purple-600 transition"></div>
+            </label>
+          </div>
+          <div class="flex items-center justify-between bg-white/5 rounded-xl p-4">
+            <span>Dark Theme</span>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="setting-dark-theme" checked class="sr-only peer">
+              <div class="w-11 h-6 bg-slate-700 rounded-full peer peer-checked:bg-purple-600 transition"></div>
+            </label>
+          </div>
+          <button onclick="saveSettings()" class="btn-primary w-full py-3 rounded-xl text-sm">Save Settings</button>
+        </div>
+
+      </div>
+    </section>
+
+  </div><!-- /p-6 -->
+</main>
+</div>
+
+<!-- ═══════════════════ MODAL ═══════════════════ -->
+<div id="modal-overlay" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-[999] items-center justify-center p-4">
+  <div id="modal-box" class="modal-animation bg-slate-900 border border-white/10 rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto custom-scrollbar"></div>
+</div>
+
+<!-- ═══════════════════ JAVASCRIPT ═══════════════════ -->
+<script>
+/* ── State ── */
+const state = { students: [], staff: [], payments: [], complaints: [], settings: {}, rooms: [], applications: [] };
+
+/* ── API helper ── */
+async function api(url, method = 'GET', body = null) {
+  const opts = {
+    method,
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    // no-cache ensures live server always returns fresh data
+    cache: 'no-cache'
+  };
+  if (body) opts.body = JSON.stringify(body);
+
+  let res;
+  try {
+    res = await fetch(url, opts);
+  } catch (networkErr) {
+    // Network-level failure: server unreachable, CORS preflight blocked, etc.
+    throw new Error('Cannot reach server. Is Flask running? (' + networkErr.message + ')');
+  }
+
+  // Try to parse JSON regardless of status so we can show server error messages
+  let data;
+  try { data = await res.json(); } catch (_) { data = null; }
+
+  if (!res.ok) {
+    const msg = data?.error || `Server error (HTTP ${res.status})`;
+    throw new Error(msg);
+  }
+  return data;
+}
+
+/* ── Toast ── */
+function showToast(message, type = 'success') {
+  const toast = document.createElement('div');
+  toast.className = `toast px-5 py-4 rounded-2xl text-sm shadow-2xl border backdrop-blur bg-slate-900 text-white ${type === 'success' ? 'border-green-500/20' : 'border-red-500/20'}`;
+  toast.innerHTML = `<div class="flex items-center gap-3"><i class="fas ${type === 'success' ? 'fa-circle-check text-green-400' : 'fa-circle-xmark text-red-400'}"></i><span>${message}</span></div>`;
+  document.getElementById('toast-container').appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+/* ── Modal ── */
+function openModal(html) {
+  const overlay = document.getElementById('modal-overlay');
+  document.getElementById('modal-box').innerHTML = html;
+  overlay.classList.remove('hidden');
+  overlay.classList.add('flex');
+}
+function closeModal() {
+  document.getElementById('modal-overlay').classList.replace('flex','hidden');
+  document.getElementById('modal-box').innerHTML = '';
+}
+
+/* ── Tab switching ── */
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-section').forEach(s => s.classList.add('hidden'));
+  const sec = document.getElementById(`tab-${tabId}`);
+  if (sec) sec.classList.remove('hidden');
+
+  document.querySelectorAll('.nav-item').forEach(n => {
+    n.classList.remove('active');
+    n.classList.add('text-slate-400');
+  });
+  const nav = document.querySelector(`[data-tab="${tabId}"]`);
+  if (nav) { nav.classList.add('active'); nav.classList.remove('text-slate-400'); }
+
+  // load data for the tab
+  if (tabId === 'dashboard')    loadDashboard();
+  if (tabId === 'students')     loadStudents();
+  if (tabId === 'rooms')        loadRooms();
+  if (tabId === 'payments')     loadPayments();
+  if (tabId === 'complaints')   loadComplaints();
+  if (tabId === 'staff')        loadStaff();
+  if (tabId === 'settings')     loadSettings();
+  if (tabId === 'applications') loadApplications();
+}
+
+/* ── Empty state ── */
+function emptyState(message) {
+  return `<div class="empty-state"><i class="fas fa-folder-open text-4xl text-slate-600 mb-4"></i><p class="text-slate-500">${message}</p></div>`;
+}
+
+/* ══════════════════════════════════════════
+   DASHBOARD
+══════════════════════════════════════════ */
+async function loadDashboard() {
+  try {
+    const data = await api('/api/dashboard');
+    document.getElementById('stat-students').textContent     = data.total_students;
+    document.getElementById('stat-rooms').textContent        = data.occupied_rooms;
+    document.getElementById('stat-payments').textContent     = data.pending_payments;
+    document.getElementById('stat-complaints').textContent   = data.active_complaints;
+    document.getElementById('stat-applications').textContent = data.pending_applications ?? 0;
+    // Update sidebar badge
+    const badge = document.getElementById('app-badge');
+    const pendingApps = data.pending_applications ?? 0;
+    if (pendingApps > 0) { badge.textContent = pendingApps; badge.classList.remove('hidden'); }
+    else { badge.classList.add('hidden'); }
+
+    const container = document.getElementById('activity-list');
+    if (!data.recent_activity || data.recent_activity.length === 0) {
+      container.innerHTML = emptyState('No recent activity available');
+      return;
+    }
+    container.innerHTML = data.recent_activity.map(item => `
+      <div class="bg-white/5 border border-white/5 rounded-2xl p-4 hover:bg-white/[0.07] transition">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <h4 class="font-semibold text-purple-400">${item.action}</h4>
+            <p class="text-sm text-slate-400 mt-1">${item.details}</p>
+          </div>
+          <span class="text-xs text-slate-500 whitespace-nowrap">${item.timestamp}</span>
+        </div>
+      </div>
+    `).join('');
+  } catch(e) {
+    showToast('Dashboard: ' + e.message, 'error');
+  }
+}
+
+/* ══════════════════════════════════════════
+   STUDENTS
+══════════════════════════════════════════ */
+async function loadStudents() {
+  try {
+    state.students = await api('/api/students');
+    renderStudents(state.students);
+  } catch(e) { showToast('Students: ' + e.message, 'error'); }
+}
+
+function renderStudents(list) {
+  const tbody = document.getElementById('students-table-body');
+  if (!list || list.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6">${emptyState('No students found. Add your first student!')}</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = list.map(s => `
+    <tr class="data-row border-b border-white/5">
+      <td class="px-5 py-4">
+        <div class="font-medium">${s.name}</div>
+        <div class="text-xs text-slate-500">${s.student_id}</div>
+      </td>
+      <td class="px-5 py-4 text-slate-400">${s.registration_number || '—'}</td>
+      <td class="px-5 py-4 text-slate-400">${s.room_number || '—'}</td>
+      <td class="px-5 py-4 text-slate-400">${s.room_type || '—'}${s.ac ? ' <span class="text-blue-400 text-xs">(AC)</span>' : ''}</td>
+      <td class="px-5 py-4 text-slate-300">${(s.fee || 0).toLocaleString()}</td>
+      <td class="px-5 py-4">
+        <div class="flex gap-2">
+          <button onclick="openEditStudentModal('${s.student_id}')" class="px-3 py-2 rounded-lg bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 transition"><i class="fas fa-pen"></i></button>
+          <button onclick="deleteStudent('${s.student_id}')" class="px-3 py-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition"><i class="fas fa-trash"></i></button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// Search filter
+document.getElementById('student-search').addEventListener('input', function() {
+  const q = this.value.toLowerCase();
+  const filtered = state.students.filter(s =>
+    s.name.toLowerCase().includes(q) ||
+    (s.student_id || '').toLowerCase().includes(q) ||
+    (s.room_number || '').toLowerCase().includes(q) ||
+    (s.registration_number || '').toLowerCase().includes(q)
+  );
+  renderStudents(filtered);
+});
+
+function openAddStudentModal() {
+  const cats = (state.settings.room_categories || ['Single','Double','Triple','Four Sharing']);
+  openModal(`
+    <div class="p-6 border-b border-white/5 flex items-center justify-between sticky top-0 bg-slate-900 z-10">
+      <h3 class="text-xl font-bold">Add New Student</h3>
+      <button onclick="closeModal()" class="w-10 h-10 rounded-full hover:bg-white/10 transition"><i class="fas fa-xmark"></i></button>
+    </div>
+    <div class="p-6 space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div><label class="text-xs text-slate-500 mb-1 block">Full Name *</label><input id="s-name" type="text" placeholder="e.g. Ali Ahmed" class="input-field"></div>
+        <div><label class="text-xs text-slate-500 mb-1 block">Registration No. *</label><input id="s-reg" type="text" placeholder="e.g. 2021-CS-101" class="input-field"></div>
+        <div><label class="text-xs text-slate-500 mb-1 block">Phone</label><input id="s-phone" type="text" placeholder="e.g. 0300-1234567" class="input-field"></div>
+        <div><label class="text-xs text-slate-500 mb-1 block">Room Number *</label><input id="s-room" type="text" placeholder="e.g. 204" class="input-field"></div>
+        <div>
+          <label class="text-xs text-slate-500 mb-1 block">Room Type</label>
+          <select id="s-type" class="input-field">
+            ${cats.map(c => `<option>${c}</option>`).join('')}
+          </select>
+        </div>
+        <div class="flex items-center gap-3 mt-5">
+          <input type="checkbox" id="s-ac" class="w-5 h-5 rounded">
+          <label for="s-ac" class="text-sm">AC Room (+PKR ${(state.settings.ac_addon||1000).toLocaleString()}/mo)</label>
+        </div>
+      </div>
+      <div class="flex justify-end gap-3 pt-2">
+        <button onclick="closeModal()" class="btn-secondary px-5 py-3 rounded-xl">Cancel</button>
+        <button onclick="addStudent(this)" class="btn-primary px-5 py-3 rounded-xl">Add Student</button>
+      </div>
+    </div>
+  `);
+}
+
+async function addStudent(btn) {
+  const name  = document.getElementById('s-name').value.trim();
+  const reg   = document.getElementById('s-reg').value.trim();
+  const phone = document.getElementById('s-phone').value.trim();
+  const room  = document.getElementById('s-room').value.trim();
+  const type  = document.getElementById('s-type').value;
+  const ac    = document.getElementById('s-ac').checked;
+
+  if (!name || !reg || !room) { showToast('Please fill required fields', 'error'); return; }
+
+  btn.disabled = true; btn.textContent = 'Saving…';
+  try {
+    await api('/api/students', 'POST', { name, registration_number: reg, phone, room_number: room, room_type: type, ac });
+    showToast('Student added successfully');
+    closeModal();
+    loadStudents();
+    loadDashboard();
+  } catch(e) { showToast('Add student failed: ' + e.message, 'error'); }
+  finally { btn.disabled = false; btn.textContent = 'Add Student'; }
+}
+
+async function openEditStudentModal(sid) {
+  try {
+    const data = await api(`/api/students/${sid}`);
+    const s    = data.student;
+    const cats = (state.settings.room_categories || ['Single','Double','Triple','Four Sharing']);
+    openModal(`
+      <div class="p-6 border-b border-white/5 flex items-center justify-between sticky top-0 bg-slate-900 z-10">
+        <h3 class="text-xl font-bold">Edit Student — ${s.name}</h3>
+        <button onclick="closeModal()" class="w-10 h-10 rounded-full hover:bg-white/10 transition"><i class="fas fa-xmark"></i></button>
+      </div>
+      <div class="p-6 space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div><label class="text-xs text-slate-500 mb-1 block">Full Name</label><input id="e-name" type="text" value="${s.name}" class="input-field"></div>
+          <div><label class="text-xs text-slate-500 mb-1 block">Reg No.</label><input id="e-reg" type="text" value="${s.registration_number||''}" class="input-field"></div>
+          <div><label class="text-xs text-slate-500 mb-1 block">Phone</label><input id="e-phone" type="text" value="${s.phone||''}" class="input-field"></div>
+          <div><label class="text-xs text-slate-500 mb-1 block">Room Number</label><input id="e-room" type="text" value="${s.room_number||''}" class="input-field"></div>
+          <div>
+            <label class="text-xs text-slate-500 mb-1 block">Room Type</label>
+            <select id="e-type" class="input-field">
+              ${cats.map(c => `<option ${c===s.room_type?'selected':''}>${c}</option>`).join('')}
+            </select>
+          </div>
+          <div class="flex items-center gap-3 mt-5">
+            <input type="checkbox" id="e-ac" class="w-5 h-5 rounded" ${s.ac?'checked':''}>
+            <label for="e-ac" class="text-sm">AC Room</label>
+          </div>
+        </div>
+        <div class="flex justify-end gap-3 pt-2">
+          <button onclick="closeModal()" class="btn-secondary px-5 py-3 rounded-xl">Cancel</button>
+          <button onclick="updateStudent('${sid}', this)" class="btn-primary px-5 py-3 rounded-xl">Update Student</button>
+        </div>
+      </div>
+    `);
+  } catch(e) { showToast('Failed to load student data', 'error'); }
+}
+
+async function updateStudent(sid, btn) {
+  const payload = {
+    name:                document.getElementById('e-name').value.trim(),
+    registration_number: document.getElementById('e-reg').value.trim(),
+    phone:               document.getElementById('e-phone').value.trim(),
+    room_number:         document.getElementById('e-room').value.trim(),
+    room_type:           document.getElementById('e-type').value,
+    ac:                  document.getElementById('e-ac').checked
+  };
+  btn.disabled = true; btn.textContent = 'Saving…';
+  try {
+    await api(`/api/students/${sid}`, 'PUT', payload);
+    showToast('Student updated successfully');
+    closeModal();
+    loadStudents();
+    loadDashboard();
+  } catch(e) { showToast('Failed to update student', 'error'); }
+  finally { btn.disabled = false; btn.textContent = 'Update Student'; }
+}
+
+async function deleteStudent(sid) {
+  if (!confirm('Delete this student? This also removes their payment record.')) return;
+  try {
+    await api(`/api/students/${sid}`, 'DELETE');
+    showToast('Student deleted');
+    loadStudents();
+    loadDashboard();
+  } catch(e) { showToast('Failed to delete student', 'error'); }
+}
+
+/* ══════════════════════════════════════════
+   ROOMS
+══════════════════════════════════════════ */
+async function loadRooms() {
+  try {
+    const data = await api('/api/rooms');
+    state.rooms = data.rooms;
+    const grid = document.getElementById('rooms-grid');
+    if (!state.rooms.length) {
+      grid.innerHTML = emptyState('No rooms occupied yet. Add students to see rooms here.');
+      return;
+    }
+    grid.innerHTML = state.rooms.map(r => `
+      <div class="dashboard-card bg-slate-900 border border-white/5 rounded-2xl p-5">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h4 class="font-bold text-lg">Room ${r.room_number}</h4>
+            <p class="text-xs text-slate-500">${r.room_type}${r.ac ? ' · AC' : ''}</p>
+          </div>
+          <div class="dashboard-icon"><i class="fas fa-bed"></i></div>
+        </div>
+        <div class="space-y-2">
+          ${r.students.map(stu => `
+            <div class="flex items-center gap-3 bg-white/5 rounded-xl px-4 py-2">
+              <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(stu.name)}&background=1d4ed8&color=fff&size=32" class="w-8 h-8 rounded-full">
+              <div>
+                <p class="text-sm font-medium">${stu.name}</p>
+                <p class="text-xs text-slate-500">${stu.student_id}</p>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        <p class="text-xs text-slate-600 mt-3">${r.students.length} occupant(s)</p>
+      </div>
+    `).join('');
+  } catch(e) { showToast('Failed to load rooms', 'error'); }
+}
+
+/* ══════════════════════════════════════════
+   PAYMENTS
+══════════════════════════════════════════ */
+async function loadPayments() {
+  try {
+    state.payments = await api('/api/payments');
+    renderPayments();
+  } catch(e) { showToast('Failed to load payments', 'error'); }
+}
+
+function renderPayments() {
+  const filter = document.getElementById('payment-filter').value;
+  const list   = filter === 'all' ? state.payments : state.payments.filter(p => p.status === filter);
+  const tbody  = document.getElementById('payments-table-body');
+  if (!list.length) {
+    tbody.innerHTML = `<tr><td colspan="5">${emptyState('No payment records found')}</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = list.map(p => `
+    <tr class="data-row border-b border-white/5">
+      <td class="px-5 py-4">
+        <div class="font-medium">${p.student_name}</div>
+        <div class="text-xs text-slate-500">${p.student_id}</div>
+      </td>
+      <td class="px-5 py-4 font-semibold text-slate-200">${(p.amount||0).toLocaleString()}</td>
+      <td class="px-5 py-4">
+        <span class="px-3 py-1 rounded-full text-xs font-medium ${p.status==='Paid'?'badge-paid':'badge-unpaid'}">${p.status}</span>
+      </td>
+      <td class="px-5 py-4 text-slate-500 text-xs">${p.created_at}</td>
+      <td class="px-5 py-4">
+        ${p.status === 'Unpaid'
+          ? `<button onclick="markPaid('${p.id}', this)" class="px-4 py-2 rounded-lg bg-green-500/10 text-green-400 hover:bg-green-500/20 transition text-xs font-medium"><i class="fas fa-check mr-1"></i>Mark Paid</button>`
+          : `<button onclick="markUnpaid('${p.id}', this)" class="px-4 py-2 rounded-lg bg-slate-700/60 text-slate-400 hover:bg-slate-700 transition text-xs font-medium"><i class="fas fa-rotate-left mr-1"></i>Revert</button>`
+        }
+      </td>
+    </tr>
+  `).join('');
+}
+
+async function markPaid(pid, btn) {
+  btn.disabled = true;
+  try {
+    await api(`/api/payments/${pid}/pay`, 'POST');
+    showToast('Payment marked as paid');
+    loadPayments();
+    loadDashboard();
+  } catch(e) { showToast('Failed to update payment', 'error'); }
+  finally { btn.disabled = false; }
+}
+
+async function markUnpaid(pid, btn) {
+  btn.disabled = true;
+  try {
+    await api(`/api/payments/${pid}/unpay`, 'POST');
+    showToast('Payment reverted to unpaid');
+    loadPayments();
+    loadDashboard();
+  } catch(e) { showToast('Failed to revert payment', 'error'); }
+  finally { btn.disabled = false; }
+}
+
+/* ══════════════════════════════════════════
+   COMPLAINTS
+══════════════════════════════════════════ */
+async function loadComplaints() {
+  try {
+    state.complaints = await api('/api/complaints');
+    renderComplaints();
+  } catch(e) { showToast('Failed to load complaints', 'error'); }
+}
+
+function renderComplaints() {
+  const container = document.getElementById('complaints-list');
+  if (!state.complaints.length) {
+    container.innerHTML = emptyState('No complaints filed. All is well!');
+    return;
+  }
+  container.innerHTML = state.complaints.map(c => `
+    <div class="bg-slate-900 border border-white/5 rounded-2xl p-5 flex items-start justify-between gap-4">
+      <div class="flex-1">
+        <div class="flex items-center gap-3 mb-2">
+          <span class="font-semibold text-purple-400">${c.category}</span>
+          <span class="px-3 py-1 rounded-full text-xs font-medium ${c.status==='Resolved'?'badge-resolved':'badge-pending'}">${c.status}</span>
+        </div>
+        <p class="text-sm text-slate-300">${c.description || 'No description provided.'}</p>
+        <div class="mt-2 flex gap-4 text-xs text-slate-500">
+          <span><i class="fas fa-user mr-1"></i>${c.student_name}</span>
+          <span><i class="fas fa-bed mr-1"></i>Room ${c.room_number || '—'}</span>
+          <span><i class="fas fa-clock mr-1"></i>${c.created_at}</span>
+        </div>
+      </div>
+      <div class="flex gap-2">
+        ${c.status !== 'Resolved' ? `<button onclick="resolveComplaint('${c.id}', this)" class="px-3 py-2 rounded-lg bg-green-500/10 text-green-400 hover:bg-green-500/20 transition text-xs"><i class="fas fa-check mr-1"></i>Resolve</button>` : ''}
+        <button onclick="deleteComplaint('${c.id}', this)" class="px-3 py-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition text-xs"><i class="fas fa-trash"></i></button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openAddComplaintModal() {
+  const students = state.students;
+  if (!students.length) { showToast('Add students first before filing a complaint', 'error'); return; }
+  openModal(`
+    <div class="p-6 border-b border-white/5 flex items-center justify-between sticky top-0 bg-slate-900 z-10">
+      <h3 class="text-xl font-bold">File a Complaint</h3>
+      <button onclick="closeModal()" class="w-10 h-10 rounded-full hover:bg-white/10 transition"><i class="fas fa-xmark"></i></button>
+    </div>
+    <div class="p-6 space-y-4">
+      <div>
+        <label class="text-xs text-slate-500 mb-1 block">Select Student *</label>
+        <select id="c-student" class="input-field">
+          ${students.map(s => `<option value="${s.student_id}">${s.name} (${s.student_id})</option>`).join('')}
+        </select>
+      </div>
+      <div>
+        <label class="text-xs text-slate-500 mb-1 block">Category *</label>
+        <select id="c-category" class="input-field">
+          <option>Electricity</option><option>Plumbing</option><option>Noise</option>
+          <option>Cleanliness</option><option>Food</option><option>Security</option><option>Other</option>
+        </select>
+      </div>
+      <div>
+        <label class="text-xs text-slate-500 mb-1 block">Description</label>
+        <textarea id="c-desc" rows="3" placeholder="Describe the issue…" class="input-field"></textarea>
+      </div>
+      <div class="flex justify-end gap-3">
+        <button onclick="closeModal()" class="btn-secondary px-5 py-3 rounded-xl">Cancel</button>
+        <button onclick="addComplaint(this)" class="btn-primary px-5 py-3 rounded-xl">Submit Complaint</button>
+      </div>
+    </div>
+  `);
+}
+
+async function addComplaint(btn) {
+  const student_id  = document.getElementById('c-student').value;
+  const category    = document.getElementById('c-category').value;
+  const description = document.getElementById('c-desc').value.trim();
+  btn.disabled = true; btn.textContent = 'Submitting…';
+  try {
+    await api('/api/complaints', 'POST', { student_id, category, description });
+    showToast('Complaint submitted');
+    closeModal();
+    loadComplaints();
+    loadDashboard();
+  } catch(e) { showToast('Failed to submit complaint', 'error'); }
+  finally { btn.disabled = false; btn.textContent = 'Submit Complaint'; }
+}
+
+async function resolveComplaint(cid, btn) {
+  btn.disabled = true;
+  try {
+    await api(`/api/complaints/${cid}/resolve`, 'POST');
+    showToast('Complaint resolved');
+    loadComplaints();
+    loadDashboard();
+  } catch(e) { showToast('Failed to resolve', 'error'); }
+  finally { btn.disabled = false; }
+}
+
+async function deleteComplaint(cid, btn) {
+  if (!confirm('Delete this complaint?')) return;
+  try {
+    await api(`/api/complaints/${cid}`, 'DELETE');
+    showToast('Complaint deleted');
+    loadComplaints();
+    loadDashboard();
+  } catch(e) { showToast('Failed to delete complaint', 'error'); }
+}
+
+/* ══════════════════════════════════════════
+   STAFF
+══════════════════════════════════════════ */
+async function loadStaff() {
+  try {
+    state.staff = await api('/api/staff');
+    renderStaff();
+  } catch(e) { showToast('Failed to load staff', 'error'); }
+}
+
+function renderStaff() {
+  const tbody = document.getElementById('staff-table-body');
+  if (!state.staff.length) {
+    tbody.innerHTML = `<tr><td colspan="6">${emptyState('No staff records. Add staff members to get started.')}</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = state.staff.map(s => `
+    <tr class="data-row border-b border-white/5">
+      <td class="px-5 py-4 font-medium">${s.name}</td>
+      <td class="px-5 py-4 text-slate-500 text-xs">${s.staff_id}</td>
+      <td class="px-5 py-4 text-slate-400">${s.category}</td>
+      <td class="px-5 py-4 text-slate-400">${s.phone || '—'}</td>
+      <td class="px-5 py-4 font-semibold text-slate-200">${(s.salary||0).toLocaleString()}</td>
+      <td class="px-5 py-4">
+        <div class="flex gap-2">
+          <button onclick="openEditStaffModal('${s.staff_id}')" class="px-3 py-2 rounded-lg bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 transition"><i class="fas fa-pen"></i></button>
+          <button onclick="deleteStaffMember('${s.staff_id}')" class="px-3 py-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition"><i class="fas fa-trash"></i></button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function openAddStaffModal() {
+  const cats = (state.settings.staff_categories || ['Servant','Sweeper','Security']);
+  openModal(`
+    <div class="p-6 border-b border-white/5 flex items-center justify-between sticky top-0 bg-slate-900 z-10">
+      <h3 class="text-xl font-bold">Add Staff Member</h3>
+      <button onclick="closeModal()" class="w-10 h-10 rounded-full hover:bg-white/10 transition"><i class="fas fa-xmark"></i></button>
+    </div>
+    <div class="p-6 space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div><label class="text-xs text-slate-500 mb-1 block">Name *</label><input id="sf-name" type="text" placeholder="Staff name" class="input-field"></div>
+        <div><label class="text-xs text-slate-500 mb-1 block">Phone</label><input id="sf-phone" type="text" placeholder="Phone number" class="input-field"></div>
+        <div>
+          <label class="text-xs text-slate-500 mb-1 block">Category *</label>
+          <select id="sf-cat" class="input-field">${cats.map(c => `<option>${c}</option>`).join('')}</select>
+        </div>
+        <div><label class="text-xs text-slate-500 mb-1 block">Salary (PKR)</label><input id="sf-sal" type="number" placeholder="e.g. 25000" class="input-field"></div>
+      </div>
+      <div class="flex justify-end gap-3 pt-2">
+        <button onclick="closeModal()" class="btn-secondary px-5 py-3 rounded-xl">Cancel</button>
+        <button onclick="addStaff(this)" class="btn-primary px-5 py-3 rounded-xl">Add Staff</button>
+      </div>
+    </div>
+  `);
+}
+
+async function addStaff(btn) {
+  const name     = document.getElementById('sf-name').value.trim();
+  const phone    = document.getElementById('sf-phone').value.trim();
+  const category = document.getElementById('sf-cat').value;
+  const salary   = parseInt(document.getElementById('sf-sal').value) || 0;
+  if (!name) { showToast('Name is required', 'error'); return; }
+  btn.disabled = true; btn.textContent = 'Saving…';
+  try {
+    await api('/api/staff', 'POST', { name, phone, category, salary });
+    showToast('Staff member added');
+    closeModal();
+    loadStaff();
+    loadDashboard();
+  } catch(e) { showToast('Failed to add staff', 'error'); }
+  finally { btn.disabled = false; btn.textContent = 'Add Staff'; }
+}
+
+function openEditStaffModal(sfid) {
+  const s    = state.staff.find(x => x.staff_id === sfid);
+  if (!s) return;
+  const cats = (state.settings.staff_categories || ['Servant','Sweeper','Security']);
+  openModal(`
+    <div class="p-6 border-b border-white/5 flex items-center justify-between sticky top-0 bg-slate-900 z-10">
+      <h3 class="text-xl font-bold">Edit Staff — ${s.name}</h3>
+      <button onclick="closeModal()" class="w-10 h-10 rounded-full hover:bg-white/10 transition"><i class="fas fa-xmark"></i></button>
+    </div>
+    <div class="p-6 space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div><label class="text-xs text-slate-500 mb-1 block">Name</label><input id="esf-name" type="text" value="${s.name}" class="input-field"></div>
+        <div><label class="text-xs text-slate-500 mb-1 block">Phone</label><input id="esf-phone" type="text" value="${s.phone||''}" class="input-field"></div>
+        <div>
+          <label class="text-xs text-slate-500 mb-1 block">Category</label>
+          <select id="esf-cat" class="input-field">${cats.map(c => `<option ${c===s.category?'selected':''}>${c}</option>`).join('')}</select>
+        </div>
+        <div><label class="text-xs text-slate-500 mb-1 block">Salary (PKR)</label><input id="esf-sal" type="number" value="${s.salary||0}" class="input-field"></div>
+      </div>
+      <div class="flex justify-end gap-3 pt-2">
+        <button onclick="closeModal()" class="btn-secondary px-5 py-3 rounded-xl">Cancel</button>
+        <button onclick="updateStaff('${sfid}', this)" class="btn-primary px-5 py-3 rounded-xl">Update Staff</button>
+      </div>
+    </div>
+  `);
+}
+
+async function updateStaff(sfid, btn) {
+  const payload = {
+    name:     document.getElementById('esf-name').value.trim(),
+    phone:    document.getElementById('esf-phone').value.trim(),
+    category: document.getElementById('esf-cat').value,
+    salary:   parseInt(document.getElementById('esf-sal').value) || 0
+  };
+  btn.disabled = true; btn.textContent = 'Saving…';
+  try {
+    await api(`/api/staff/${sfid}`, 'PUT', payload);
+    showToast('Staff updated');
+    closeModal();
+    loadStaff();
+  } catch(e) { showToast('Failed to update staff', 'error'); }
+  finally { btn.disabled = false; btn.textContent = 'Update Staff'; }
+}
+
+async function deleteStaffMember(sfid) {
+  if (!confirm('Delete this staff member?')) return;
+  try {
+    await api(`/api/staff/${sfid}`, 'DELETE');
+    showToast('Staff member removed');
+    loadStaff();
+    loadDashboard();
+  } catch(e) { showToast('Failed to delete', 'error'); }
+}
+
+/* ══════════════════════════════════════════
+   SETTINGS
+══════════════════════════════════════════ */
+async function loadSettings() {
+  try {
+    state.settings = await api('/api/settings');
+    const s = state.settings;
+    const prices = s.room_prices || {};
+    document.getElementById('price-Single').value      = prices['Single'] || 15000;
+    document.getElementById('price-Double').value      = prices['Double'] || 10000;
+    document.getElementById('price-Triple').value      = prices['Triple'] || 5000;
+    document.getElementById('price-FourSharing').value = prices['Four Sharing'] || 4000;
+    document.getElementById('price-ac_addon').value    = s.ac_addon || 1000;
+    document.getElementById('setting-hostel-name').value = s.hostel_name || 'UET Hostel';
+    document.getElementById('setting-admin-name').value  = s.admin_name  || 'Admin';
+    document.getElementById('setting-notifications').checked = s.notifications !== false;
+    document.getElementById('setting-dark-theme').checked    = s.dark_theme !== false;
+    // update sidebar name
+    document.getElementById('hostel-name-sidebar').textContent = s.hostel_name || 'UET Hostel';
+    // update avatar
+    document.getElementById('admin-avatar').src =
+      `https://ui-avatars.com/api/?name=${encodeURIComponent(s.admin_name||'Admin')}&background=1d4ed8&color=fff`;
+  } catch(e) { showToast('Failed to load settings', 'error'); }
+}
+
+async function savePrices() {
+  const room_prices = {
+    'Single':       parseInt(document.getElementById('price-Single').value)      || 15000,
+    'Double':       parseInt(document.getElementById('price-Double').value)      || 10000,
+    'Triple':       parseInt(document.getElementById('price-Triple').value)      || 5000,
+    'Four Sharing': parseInt(document.getElementById('price-FourSharing').value) || 4000,
+  };
+  const ac_addon = parseInt(document.getElementById('price-ac_addon').value) || 1000;
+  try {
+    await api('/api/settings', 'POST', { room_prices, ac_addon });
+    state.settings = { ...state.settings, room_prices, ac_addon };
+    showToast('Room prices saved');
+  } catch(e) { showToast('Failed to save prices', 'error'); }
+}
+
+async function saveSettings() {
+  const payload = {
+    hostel_name:   document.getElementById('setting-hostel-name').value.trim() || 'UET Hostel',
+    admin_name:    document.getElementById('setting-admin-name').value.trim()  || 'Admin',
+    notifications: document.getElementById('setting-notifications').checked,
+    dark_theme:    document.getElementById('setting-dark-theme').checked,
+  };
+  try {
+    await api('/api/settings', 'POST', payload);
+    state.settings = { ...state.settings, ...payload };
+    document.getElementById('hostel-name-sidebar').textContent = payload.hostel_name;
+    document.getElementById('admin-avatar').src =
+      `https://ui-avatars.com/api/?name=${encodeURIComponent(payload.admin_name)}&background=1d4ed8&color=fff`;
+    showToast('Settings saved');
+  } catch(e) { showToast('Failed to save settings', 'error'); }
+}
+
+/* ══════════════════════════════════════════
+   APPLICATIONS
+══════════════════════════════════════════ */
+async function loadApplications() {
+  try {
+    state.applications = await api('/api/applications');
+    renderApplications();
+  } catch(e) { showToast('Failed to load applications: ' + e.message, 'error'); }
+}
+
+function renderApplications() {
+  const filter = document.getElementById('app-filter').value;
+  const list   = filter === 'all' ? state.applications : state.applications.filter(a => a.status === filter);
+  const container = document.getElementById('applications-list');
+  if (!list.length) {
+    container.innerHTML = emptyState(filter === 'Pending' ? 'No pending applications.' : 'No applications found.');
+    return;
+  }
+  container.innerHTML = list.map(a => {
+    const statusClass = a.status === 'Approved' ? 'badge-paid' : a.status === 'Rejected' ? 'badge-unpaid' : 'badge-pending';
+    const statusIcon  = a.status === 'Approved' ? 'fa-circle-check' : a.status === 'Rejected' ? 'fa-circle-xmark' : 'fa-hourglass-half';
+    return `
+      <div class="bg-slate-900 border border-white/5 rounded-2xl p-5">
+        <div class="flex flex-col lg:flex-row lg:items-center gap-5">
+          <div class="flex items-start gap-4 flex-1">
+            <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(a.name)}&background=1d4ed8&color=fff&size=48" class="w-12 h-12 rounded-xl flex-shrink-0">
+            <div class="flex-1 min-w-0">
+              <div class="flex flex-wrap items-center gap-3 mb-1">
+                <h4 class="font-bold text-lg">${a.name}</h4>
+                <span class="px-3 py-1 rounded-full text-xs font-medium ${statusClass}"><i class="fas ${statusIcon} mr-1"></i>${a.status}</span>
+              </div>
+              <div class="flex flex-wrap gap-x-5 gap-y-1 text-xs text-slate-500">
+                <span><i class="fas fa-id-card mr-1"></i>${a.registration_number || '—'}</span>
+                <span><i class="fas fa-building-columns mr-1"></i>${a.department || '—'}</span>
+                <span><i class="fas fa-calendar-days mr-1"></i>${a.year || '—'}</span>
+                <span><i class="fas fa-phone mr-1"></i>${a.phone || '—'}</span>
+              </div>
+              <div class="flex flex-wrap gap-x-5 gap-y-1 text-xs text-slate-500 mt-1">
+                <span><i class="fas fa-bed mr-1"></i>${a.room_type}${a.ac ? ' + AC' : ''}</span>
+                <span><i class="fas fa-person-shelter mr-1"></i>${a.guardian_name || '—'} (${a.guardian_relation || '—'})</span>
+                <span><i class="fas fa-clock mr-1"></i>${(a.created_at || '').split(' ')[0]}</span>
+              </div>
+              ${a.special_requirements ? `<p class="text-xs text-slate-600 mt-1 italic">"${a.special_requirements}"</p>` : ''}
+              ${a.status === 'Rejected' && a.rejection_reason ? `<p class="text-xs text-red-400 mt-1"><i class="fas fa-triangle-exclamation mr-1"></i>${a.rejection_reason}</p>` : ''}
+            </div>
+          </div>
+          <div class="flex gap-2 flex-shrink-0">
+            ${a.status === 'Pending' ? `
+              <button onclick="openApproveModal('${a.id}')" class="px-4 py-2 rounded-xl bg-green-500/10 text-green-400 hover:bg-green-500/20 transition text-sm font-semibold flex items-center gap-2">
+                <i class="fas fa-check"></i>Approve
+              </button>
+              <button onclick="openRejectModal('${a.id}', '${a.name.replace(/'/g,"\\'")}', this)" class="px-4 py-2 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 transition text-sm font-semibold flex items-center gap-2">
+                <i class="fas fa-xmark"></i>Reject
+              </button>
+            ` : ''}
+            <button onclick="deleteApplication('${a.id}')" class="px-3 py-2 rounded-xl bg-slate-700/50 text-slate-400 hover:bg-slate-700 transition text-sm">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function openApproveModal(aid) {
+  const appl = state.applications.find(a => a.id === aid);
+  if (!appl) return;
+  openModal(`
+    <div class="p-6 border-b border-white/5 flex items-center justify-between sticky top-0 bg-slate-900 z-10">
+      <h3 class="text-xl font-bold text-green-400"><i class="fas fa-circle-check mr-2"></i>Approve Application</h3>
+      <button onclick="closeModal()" class="w-10 h-10 rounded-full hover:bg-white/10 transition"><i class="fas fa-xmark"></i></button>
+    </div>
+    <div class="p-6 space-y-4">
+      <div class="bg-white/5 rounded-2xl p-4 space-y-2">
+        <p class="font-semibold text-lg">${appl.name}</p>
+        <div class="grid grid-cols-2 gap-2 text-sm text-slate-400">
+          <span><i class="fas fa-id-card mr-1"></i>${appl.registration_number}</span>
+          <span><i class="fas fa-building-columns mr-1"></i>${appl.department || '—'}</span>
+          <span><i class="fas fa-bed mr-1"></i>${appl.room_type}${appl.ac ? ' + AC' : ''}</span>
+          <span><i class="fas fa-phone mr-1"></i>${appl.phone}</span>
+        </div>
+      </div>
+      <div>
+        <label class="text-xs text-slate-500 mb-1 block">Assign Room Number <span class="text-red-400">*</span></label>
+        <input id="approve-room" type="text" placeholder="e.g. 204" class="input-field">
+        <p class="text-xs text-slate-600 mt-1">This will create a student record and assign the room.</p>
+      </div>
+      <div class="flex justify-end gap-3 pt-2">
+        <button onclick="closeModal()" class="btn-secondary px-5 py-3 rounded-xl">Cancel</button>
+        <button onclick="approveApplication('${aid}', this)" class="px-5 py-3 rounded-xl text-sm font-semibold" style="background:linear-gradient(135deg,#22c55e,#16a34a);color:white;border:none;cursor:pointer;font-family:inherit;transition:all 0.2s;">
+          <i class="fas fa-check mr-2"></i>Confirm Approval
+        </button>
+      </div>
+    </div>
+  `);
+}
+
+async function approveApplication(aid, btn) {
+  const room = document.getElementById('approve-room').value.trim();
+  if (!room) { showToast('Room number is required', 'error'); return; }
+  btn.disabled = true; btn.textContent = 'Approving…';
+  try {
+    const data = await api(`/api/applications/${aid}/approve`, 'POST', { room_number: room });
+    showToast(`Application approved → ${data.student_id} assigned to Room ${room}`);
+    closeModal();
+    loadApplications();
+    loadDashboard();
+  } catch(e) { showToast('Approval failed: ' + e.message, 'error'); }
+  finally { btn.disabled = false; btn.innerHTML = '<i class="fas fa-check mr-2"></i>Confirm Approval'; }
+}
+
+function openRejectModal(aid, name) {
+  openModal(`
+    <div class="p-6 border-b border-white/5 flex items-center justify-between sticky top-0 bg-slate-900 z-10">
+      <h3 class="text-xl font-bold text-red-400"><i class="fas fa-circle-xmark mr-2"></i>Reject Application</h3>
+      <button onclick="closeModal()" class="w-10 h-10 rounded-full hover:bg-white/10 transition"><i class="fas fa-xmark"></i></button>
+    </div>
+    <div class="p-6 space-y-4">
+      <p class="text-slate-400">You are rejecting the application of <span class="text-white font-semibold">${name}</span>.</p>
+      <div>
+        <label class="text-xs text-slate-500 mb-1 block">Rejection Reason</label>
+        <textarea id="reject-reason" rows="3" placeholder="e.g. All seats are filled for this session." class="input-field"></textarea>
+      </div>
+      <div class="flex justify-end gap-3 pt-2">
+        <button onclick="closeModal()" class="btn-secondary px-5 py-3 rounded-xl">Cancel</button>
+        <button onclick="rejectApplication('${aid}', this)" class="px-5 py-3 rounded-xl text-sm font-semibold bg-red-500/20 text-red-400 hover:bg-red-500/30 transition border border-red-500/20" style="font-family:inherit;cursor:pointer;">
+          <i class="fas fa-xmark mr-2"></i>Confirm Rejection
+        </button>
+      </div>
+    </div>
+  `);
+}
+
+async function rejectApplication(aid, btn) {
+  const reason = document.getElementById('reject-reason').value.trim() || 'Does not meet requirements';
+  btn.disabled = true; btn.textContent = 'Rejecting…';
+  try {
+    await api(`/api/applications/${aid}/reject`, 'POST', { reason });
+    showToast('Application rejected');
+    closeModal();
+    loadApplications();
+    loadDashboard();
+  } catch(e) { showToast('Rejection failed: ' + e.message, 'error'); }
+  finally { btn.disabled = false; btn.innerHTML = '<i class="fas fa-xmark mr-2"></i>Confirm Rejection'; }
+}
+
+async function deleteApplication(aid) {
+  if (!confirm('Delete this application permanently?')) return;
+  try {
+    await api(`/api/applications/${aid}`, 'DELETE');
+    showToast('Application deleted');
+    loadApplications();
+    loadDashboard();
+  } catch(e) { showToast('Failed to delete application', 'error'); }
+}
+
+/* ══════════════════════════════════════════
+   GLOBAL SEARCH
+══════════════════════════════════════════ */
+let searchTimer;
+document.getElementById('global-search').addEventListener('input', function() {
+  clearTimeout(searchTimer);
+  const q = this.value.trim();
+  if (!q) { document.getElementById('search-dropdown').classList.add('hidden'); return; }
+  searchTimer = setTimeout(async () => {
+    try {
+      const results = await api(`/api/search?q=${encodeURIComponent(q)}`);
+      const dd = document.getElementById('search-dropdown');
+      if (!results.length) { dd.classList.add('hidden'); return; }
+      dd.innerHTML = results.map(r => `
+        <div class="px-4 py-3 hover:bg-white/5 cursor-pointer border-b border-white/5 last:border-0"
+             onclick="handleSearchSelect('${r.type}', '${r.student_id || r.staff_id}')">
+          <div class="flex items-center gap-3">
+            <span class="text-xs px-2 py-1 rounded-full ${r.type==='student'?'bg-purple-500/20 text-purple-400':'bg-blue-500/20 text-blue-400'}">${r.type}</span>
+            <span class="font-medium text-sm">${r.name}</span>
+            <span class="text-xs text-slate-500">${r.student_id || r.staff_id}</span>
+          </div>
+        </div>
+      `).join('');
+      dd.classList.remove('hidden');
+    } catch(e) {}
+  }, 300);
+});
+
+function handleSearchSelect(type, id) {
+  document.getElementById('global-search').value = '';
+  document.getElementById('search-dropdown').classList.add('hidden');
+  switchTab(type === 'student' ? 'students' : 'staff');
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('#global-search') && !e.target.closest('#search-dropdown')) {
+    document.getElementById('search-dropdown').classList.add('hidden');
+  }
+});
+
+/* ══════════════════════════════════════════
+   NAV CLICKS + MODAL CLOSE
+══════════════════════════════════════════ */
+document.addEventListener('click', e => {
+  const nav = e.target.closest('.nav-item');
+  if (nav && nav.dataset.tab) switchTab(nav.dataset.tab);
+});
+
+window.addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-overlay')) closeModal();
+});
+window.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+/* ══════════════════════════════════════════
+   INIT
+══════════════════════════════════════════ */
+window.onload = async () => {
+  // Show a loading indicator while connecting
+  const statEls = ['stat-students','stat-rooms','stat-payments','stat-complaints'];
+  statEls.forEach(id => { const el = document.getElementById(id); if(el) el.textContent = '…'; });
+
+  // Load settings first (needed for modals: room types, AC price, etc.)
+  try {
+    state.settings = await api('/api/settings');
+    // Update sidebar hostel name from saved settings
+    const nameEl = document.getElementById('hostel-name-sidebar');
+    if (nameEl && state.settings.hostel_name) nameEl.textContent = state.settings.hostel_name;
+    const avatar = document.getElementById('admin-avatar');
+    if (avatar && state.settings.admin_name) {
+      avatar.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(state.settings.admin_name)}&background=1d4ed8&color=fff`;
+    }
+  } catch(e) {
+    showToast('⚠ Could not connect to Flask server. Make sure app.py is running.', 'error');
+    statEls.forEach(id => { const el = document.getElementById(id); if(el) el.textContent = '—'; });
+    return; // stop init if server is unreachable
+  }
+
+  // Pre-load students list (used in Add Complaint modal dropdown)
+  try { state.students = await api('/api/students'); } catch(e) { state.students = []; }
+
+  // Load dashboard data
+  loadDashboard();
+};
+</script>
+
+</body>
+</html>

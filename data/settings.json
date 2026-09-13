@@ -1,0 +1,25 @@
+{
+  "hostel_name": "UET Hostel",
+  "admin_name": "Admin",
+  "notifications": true,
+  "dark_theme": true,
+  "room_prices": {
+    "Single": 15000,
+    "Double": 10000,
+    "Triple": 5000,
+    "Four Sharing": 4000
+  },
+  "ac_addon": 1000,
+  "room_categories": ["Single", "Double", "Triple", "Four Sharing"],
+  "staff_categories": [
+    "Resident Tutor",
+    "Mess Head",
+    "Servants",
+    "Dhobi",
+    "Sweepers",
+    "Plumbers",
+    "Electricians",
+    "Carpenters",
+    "Painters"
+  ]
+}

@@ -1,0 +1,18 @@
+[
+  {
+    "staff_id": "STF0001",
+    "name": "Usman Raza",
+    "category": "Resident Tutor",
+    "phone": "0300-8889900",
+    "salary": 85000,
+    "created_at": "2026-08-15"
+  },
+  {
+    "staff_id": "STF0002",
+    "name": "Nadia Iqbal",
+    "category": "Mess Head",
+    "phone": "0300-9990011",
+    "salary": 65000,
+    "created_at": "2026-08-16"
+  }
+]

@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Login — UET Hostel Portal</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Inter',sans-serif; min-height:100vh; background:#f0f6ff; display:flex; align-items:center; justify-content:center; padding:24px; }
+
+.login-card {
+  width:100%; max-width:960px; min-height:580px;
+  display:flex; border-radius:20px; overflow:hidden;
+  box-shadow:0 20px 60px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.06);
+}
+
+/* Left panel — deep university blue */
+.panel-left {
+  width:340px; flex-shrink:0;
+  background:linear-gradient(160deg, #0f2356 0%, #1d4ed8 100%);
+  padding:48px 36px; display:flex; flex-direction:column;
+  justify-content:space-between;
+}
+.brand { text-align:center; }
+.brand img { width:72px; height:72px; border-radius:50%; border:3px solid rgba(255,255,255,0.3); background:white; padding:5px; object-fit:contain; }
+.brand h1 { font-size:1.05rem; font-weight:800; color:#ffffff; margin-top:14px; line-height:1.3; }
+.brand p { font-size:0.72rem; color:rgba(255,255,255,0.55); margin-top:5px; }
+
+.toggle-group { display:flex; gap:8px; }
+.toggle-btn {
+  flex:1; padding:12px 0; border-radius:10px;
+  border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.08);
+  color:rgba(255,255,255,0.6); font-size:0.88rem; font-weight:600;
+  cursor:pointer; font-family:inherit; transition:all 0.25s ease;
+}
+.toggle-btn:hover { background:rgba(255,255,255,0.15); color:white; }
+.toggle-btn.active { background:white; color:#1d4ed8; border-color:white; box-shadow:0 4px 16px rgba(0,0,0,0.2); }
+
+.help-box { background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12); border-radius:12px; padding:16px 18px; }
+.help-box .label { font-size:0.67rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,0.5); margin-bottom:12px; }
+.help-item { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+.help-item:last-child { margin-bottom:0; }
+.help-icon { width:28px; height:28px; border-radius:7px; background:rgba(255,255,255,0.12); display:flex; align-items:center; justify-content:center; font-size:0.72rem; color:rgba(255,255,255,0.7); flex-shrink:0; }
+.help-item a, .help-item span { font-size:0.78rem; color:rgba(255,255,255,0.5); text-decoration:none; }
+.help-item a:hover { color:white; }
+
+.back-link { font-size:0.78rem; color:rgba(255,255,255,0.35); text-decoration:none; display:flex; align-items:center; gap:6px; justify-content:center; transition:color 0.2s; }
+.back-link:hover { color:rgba(255,255,255,0.7); }
+
+/* Right panel */
+.panel-right { flex:1; background:#ffffff; display:flex; align-items:center; justify-content:center; padding:56px 52px; }
+
+.role-panel { width:100%; max-width:360px; display:none; animation:fadeIn 0.3s ease; }
+.role-panel.active { display:block; }
+@keyframes fadeIn { from{opacity:0;transform:translateX(12px)} to{opacity:1;transform:translateX(0)} }
+
+.form-badge { display:inline-flex; align-items:center; gap:7px; padding:5px 14px; border-radius:100px; font-size:0.67rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; margin-bottom:22px; }
+.badge-admin   { background:#eff6ff; border:1px solid #bfdbfe; color:#1d4ed8; }
+.badge-student { background:#f0fdf4; border:1px solid #bbf7d0; color:#15803d; }
+
+.role-panel h2 { font-size:2rem; font-weight:800; color:#0f172a; letter-spacing:-0.5px; margin-bottom:6px; }
+.role-panel .sub { font-size:0.86rem; color:#64748b; margin-bottom:28px; line-height:1.6; }
+
+/* Form fields */
+.field-group { margin-bottom:16px; }
+.field-label { display:block; font-size:0.72rem; font-weight:700; color:#475569; text-transform:uppercase; letter-spacing:1px; margin-bottom:7px; }
+.field-input {
+  width:100%; background:#f8fafc; border:1.5px solid #e2e8f0;
+  border-radius:10px; padding:13px 16px 13px 42px; color:#0f172a;
+  font-size:0.92rem; font-family:inherit; outline:none;
+  transition:all 0.25s ease;
+}
+.field-input:focus { border-color:#1d4ed8; box-shadow:0 0 0 3px rgba(29,78,216,0.1); background:#fff; }
+.field-input::placeholder { color:#c1c9d6; }
+.input-wrap { position:relative; }
+.input-icon { position:absolute; left:14px; top:50%; transform:translateY(-50%); color:#94a3b8; font-size:0.85rem; }
+
+/* Password toggle */
+.pw-toggle { position:absolute; right:14px; top:50%; transform:translateY(-50%); color:#94a3b8; cursor:pointer; font-size:0.85rem; transition:color 0.2s; }
+.pw-toggle:hover { color:#475569; }
+
+/* Submit button */
+.submit-btn { width:100%; padding:14px; border-radius:10px; border:none; font-size:0.95rem; font-weight:700; font-family:inherit; cursor:pointer; transition:all 0.25s ease; display:flex; align-items:center; justify-content:center; gap:9px; margin-top:20px; }
+.submit-admin   { background:linear-gradient(135deg,#1d4ed8,#3b82f6); color:white; box-shadow:0 4px 20px rgba(29,78,216,0.3); }
+.submit-admin:hover { box-shadow:0 8px 32px rgba(29,78,216,0.45); transform:translateY(-1px); }
+.submit-student { background:linear-gradient(135deg,#15803d,#22c55e); color:white; box-shadow:0 4px 20px rgba(34,197,94,0.25); }
+.submit-student:hover { box-shadow:0 8px 32px rgba(34,197,94,0.4); transform:translateY(-1px); }
+
+/* Divider */
+.divider { display:flex; align-items:center; gap:12px; margin:20px 0; }
+.divider-line { flex:1; height:1px; background:#f1f5f9; }
+.divider-text { font-size:0.75rem; color:#cbd5e1; font-weight:500; }
+
+/* Note */
+.note { font-size:0.75rem; color:#94a3b8; text-align:center; margin-top:16px; line-height:1.5; }
+
+@media(max-width:700px){
+  .login-card { flex-direction:column; }
+  .panel-left { width:100%; padding:32px 24px; min-height:auto; }
+  .panel-right { padding:36px 24px; }
+}
+</style>
+</head>
+<body>
+
+<div class="login-card">
+
+  <!-- ── LEFT PANEL ── -->
+  <div class="panel-left">
+    <div class="brand">
+      <img src="https://www.pngitem.com/pimgs/m/17-171570_uet-lahore-logo-clipart-png-download-university-of.png" alt="UET">
+      <h1>University of Engineering and Technology, Lahore</h1>
+      <p>Est. 1921 &nbsp;·&nbsp; HEC Recognized</p>
+    </div>
+
+    <div>
+      <p style="font-size:0.67rem;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,0.45);text-align:center;margin-bottom:12px;">Continue As</p>
+      <div class="toggle-group">
+        <button class="toggle-btn active" id="btn-admin" onclick="setRole('admin')">
+          <i class="fas fa-user-shield mr-1"></i> Admin
+        </button>
+        <button class="toggle-btn" id="btn-student" onclick="setRole('student')">
+          <i class="fas fa-graduation-cap mr-1"></i> Student
+        </button>
+      </div>
+    </div>
+
+    <div>
+      <div class="help-box">
+        <p class="label">Need Help?</p>
+        <div class="help-item">
+          <div class="help-icon"><i class="fas fa-envelope"></i></div>
+          <a href="mailto:hostel@uet.edu.pk">hostel@uet.edu.pk</a>
+        </div>
+        <div class="help-item">
+          <div class="help-icon"><i class="fas fa-phone"></i></div>
+          <span>+92-42-9029210</span>
+        </div>
+      </div>
+      <div style="margin-top:14px;">
+        <a href="/" class="back-link"><i class="fas fa-arrow-left" style="font-size:0.72rem;"></i> Back to Home</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── RIGHT PANEL ── -->
+  <div class="panel-right">
+
+    <!-- ADMIN FORM -->
+    <div class="role-panel active" id="panel-admin">
+      <div class="form-badge badge-admin"><i class="fas fa-shield-halved"></i> Admin Access</div>
+      <h2>Welcome Back</h2>
+      <p class="sub">Sign in to manage hostel operations and student records.</p>
+
+      <div class="field-group">
+        <label class="field-label">Admin Email</label>
+        <div class="input-wrap">
+          <i class="fas fa-envelope input-icon"></i>
+          <input type="email" id="admin-email" class="field-input" placeholder="Enter admin email" autocomplete="email">
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Password</label>
+        <div class="input-wrap">
+          <i class="fas fa-lock input-icon"></i>
+          <input type="password" id="admin-pw" class="field-input" placeholder="Enter your password">
+          <span class="pw-toggle" onclick="togglePw('admin-pw', this)"><i class="fas fa-eye"></i></span>
+        </div>
+      </div>
+
+      <div id="admin-login-err" style="display:none;color:#dc2626;font-size:0.82rem;margin-bottom:10px;padding:8px 12px;background:#fef2f2;border-radius:8px;border:1px solid #fecaca;"></div>
+
+      <button class="submit-btn submit-admin" onclick="doAdminLogin()">
+        <i class="fas fa-chart-line"></i> Login as Admin
+      </button>
+
+      <p class="note">Authorised hostel administration personnel only.<br>Contact IT support if you have trouble logging in.</p>
+    </div>
+
+    <!-- STUDENT FORM -->
+    <div class="role-panel" id="panel-student">
+      <div class="form-badge badge-student"><i class="fas fa-graduation-cap"></i> Student Access</div>
+
+      <!-- Login / Register toggle -->
+      <div style="display:flex;gap:6px;margin-bottom:22px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:4px;">
+        <button id="s-tab-login" onclick="studentTab('login')"
+          style="flex:1;padding:9px;border:none;border-radius:8px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;background:#15803d;color:white;transition:all 0.2s;">
+          <i class="fas fa-sign-in-alt mr-1"></i> Login
+        </button>
+        <button id="s-tab-register" onclick="studentTab('register')"
+          style="flex:1;padding:9px;border:none;border-radius:8px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;background:transparent;color:#64748b;transition:all 0.2s;">
+          <i class="fas fa-user-plus mr-1"></i> Register
+        </button>
+      </div>
+
+      <!-- LOGIN PANEL -->
+      <div id="s-login-panel">
+        <h2>Welcome Back</h2>
+        <p class="sub">Sign in to apply or track your hostel application.</p>
+        <div class="field-group">
+          <label class="field-label">Email</label>
+          <div class="input-wrap">
+            <i class="fas fa-envelope input-icon"></i>
+            <input type="email" id="s-login-email" class="field-input" placeholder="yourname@uet.edu.pk">
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Password</label>
+          <div class="input-wrap">
+            <i class="fas fa-lock input-icon"></i>
+            <input type="password" id="student-pw" class="field-input" placeholder="Enter your password">
+            <span class="pw-toggle" onclick="togglePw('student-pw', this)"><i class="fas fa-eye"></i></span>
+          </div>
+        </div>
+        <div id="s-login-err" style="display:none;color:#dc2626;font-size:0.82rem;margin-bottom:10px;padding:8px 12px;background:#fef2f2;border-radius:8px;border:1px solid #fecaca;"></div>
+        <button class="submit-btn submit-student" onclick="doStudentLogin()">
+          <i class="fas fa-arrow-right-to-bracket"></i> Login as Student
+        </button>
+        <p class="note" style="margin-top:12px;">No account yet? Click <b style="color:#15803d;cursor:pointer;" onclick="studentTab('register')">Register</b> above.</p>
+      </div>
+
+      <!-- REGISTER PANEL -->
+      <div id="s-register-panel" style="display:none;">
+        <h2>Create Account</h2>
+        <p class="sub">New student? Register to apply for hostel accommodation.</p>
+        <div class="field-group">
+          <label class="field-label">Full Name</label>
+          <div class="input-wrap">
+            <i class="fas fa-user input-icon"></i>
+            <input type="text" id="r-name" class="field-input" placeholder="Muhammad Ali Hassan">
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Email</label>
+          <div class="input-wrap">
+            <i class="fas fa-envelope input-icon"></i>
+            <input type="email" id="r-email" class="field-input" placeholder="yourname@uet.edu.pk">
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Registration Number</label>
+          <div class="input-wrap">
+            <i class="fas fa-id-card input-icon"></i>
+            <input type="text" id="r-regno" class="field-input" placeholder="2021-CS-001">
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Password</label>
+          <div class="input-wrap">
+            <i class="fas fa-lock input-icon"></i>
+            <input type="password" id="r-pw" class="field-input" placeholder="Min. 6 characters">
+            <span class="pw-toggle" onclick="togglePw('r-pw', this)"><i class="fas fa-eye"></i></span>
+          </div>
+        </div>
+        <div id="s-reg-err" style="display:none;color:#dc2626;font-size:0.82rem;margin-bottom:10px;padding:8px 12px;background:#fef2f2;border-radius:8px;border:1px solid #fecaca;"></div>
+        <div id="s-reg-ok"  style="display:none;color:#15803d;font-size:0.82rem;margin-bottom:10px;padding:8px 12px;background:#f0fdf4;border-radius:8px;border:1px solid #bbf7d0;"></div>
+        <button class="submit-btn submit-student" onclick="doRegister()">
+          <i class="fas fa-user-plus"></i> Create Account
+        </button>
+        <p class="note" style="margin-top:12px;">Already have an account? <b style="color:#15803d;cursor:pointer;" onclick="studentTab('login')">Login</b></p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function setRole(role) {
+  document.getElementById('btn-admin').classList.toggle('active', role === 'admin');
+  document.getElementById('btn-student').classList.toggle('active', role === 'student');
+  document.getElementById('panel-admin').classList.toggle('active', role === 'admin');
+  document.getElementById('panel-student').classList.toggle('active', role === 'student');
+}
+
+function studentTab(tab) {
+  const isLogin = tab === 'login';
+  document.getElementById('s-login-panel').style.display    = isLogin ? 'block' : 'none';
+  document.getElementById('s-register-panel').style.display = isLogin ? 'none'  : 'block';
+  document.getElementById('s-tab-login').style.background    = isLogin ? '#15803d' : 'transparent';
+  document.getElementById('s-tab-login').style.color         = isLogin ? 'white'   : '#64748b';
+  document.getElementById('s-tab-register').style.background = isLogin ? 'transparent' : '#15803d';
+  document.getElementById('s-tab-register').style.color      = isLogin ? '#64748b'     : 'white';
+}
+
+function togglePw(id, icon) {
+  const input = document.getElementById(id);
+  const showing = input.type === 'text';
+  input.type = showing ? 'password' : 'text';
+  icon.innerHTML = showing ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+}
+
+async function doAdminLogin() {
+  const email = document.getElementById('admin-email').value.trim();
+  const pw    = document.getElementById('admin-pw').value.trim();
+  const errEl = document.getElementById('admin-login-err');
+  errEl.style.display = 'none';
+  try {
+    const res  = await fetch('/api/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email, password: pw, role:'admin'}) });
+    const data = await res.json();
+    if (data.success) { window.location.href = data.redirect; }
+    else { errEl.textContent = data.error; errEl.style.display = 'block'; }
+  } catch(e) { errEl.textContent = 'Connection error'; errEl.style.display = 'block'; }
+}
+
+async function doStudentLogin() {
+  const email = document.getElementById('s-login-email').value.trim();
+  const pw    = document.getElementById('student-pw').value.trim();
+  const errEl = document.getElementById('s-login-err');
+  errEl.style.display = 'none';
+  try {
+    const res  = await fetch('/api/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email, password: pw, role:'student'}) });
+    const data = await res.json();
+    if (data.success) { window.location.href = data.redirect; }
+    else { errEl.textContent = data.error; errEl.style.display = 'block'; }
+  } catch(e) { errEl.textContent = 'Connection error'; errEl.style.display = 'block'; }
+}
+
+async function doRegister() {
+  const name   = document.getElementById('r-name').value.trim();
+  const email  = document.getElementById('r-email').value.trim();
+  const reg_no = document.getElementById('r-regno').value.trim();
+  const pw     = document.getElementById('r-pw').value.trim();
+  const errEl  = document.getElementById('s-reg-err');
+  const okEl   = document.getElementById('s-reg-ok');
+  errEl.style.display = 'none'; okEl.style.display = 'none';
+  try {
+    const res  = await fetch('/api/register', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({name, email, reg_no, password: pw}) });
+    const data = await res.json();
+    if (data.success) {
+      okEl.textContent = 'Account created! Please login now.';
+      okEl.style.display = 'block';
+      setTimeout(() => studentTab('login'), 1500);
+    } else {
+      errEl.textContent = data.error; errEl.style.display = 'block';
+    }
+  } catch(e) { errEl.textContent = 'Connection error'; errEl.style.display = 'block'; }
+}
+</script>
+</body>
+</html>
