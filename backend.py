@@ -55,44 +55,32 @@ def now_string(with_time=True):
     return dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S" if with_time else "%Y-%m-%d")
 
 
-def read_file(key):
-    path = FILES[key]
-    if not os.path.exists(path):
-        default = DEFAULT_SETTINGS if key == "settings" else []
-        if key == "settings":
-            write_file(key, default)
-        return default
-    try:
-        with open(path, "r", encoding="utf-8") as f:
-            value = json.load(f)
-        if key == "settings" and not isinstance(value, dict):
-            return DEFAULT_SETTINGS.copy()
-        if key != "settings" and not isinstance(value, list):
-            return []
-        return value
-    except (OSError, json.JSONDecodeError):
-        return DEFAULT_SETTINGS.copy() if key == "settings" else []
+# In-Memory Storage for Serverless Environments (Vercel)
+MEM_STORE = {
+    "students": [],
+    "staff": [],
+    "complaints": [],
+    "payments": [],
+    "settings": DEFAULT_SETTINGS.copy(),
+    "activity": [],
+    "applications": [],
+    "users": []
+}
 
+def read_file(key):
+    if not MEM_STORE[key]:
+        path = FILES.get(key)
+        if path and os.path.exists(path):
+            try:
+                with open(path, "r", encoding="utf-8") as f:
+                    MEM_STORE[key] = json.load(f)
+            except Exception:
+                pass
+    return MEM_STORE[key]
 
 def write_file(key, data):
-    """Atomically replace a JSON data file to reduce corruption from partial writes."""
-    path = FILES[key]
-    temp_path = f"{path}.{os.getpid()}.{uuid.uuid4().hex}.tmp"
-    try:
-        with _write_lock:
-            with open(temp_path, "w", encoding="utf-8") as f:
-                json.dump(data, f, indent=2, ensure_ascii=False)
-                f.write("\n")
-            os.replace(temp_path, path)
-        return True
-    except OSError as exc:
-        print(f"[write_file ERROR] {key}: {exc}")
-        try:
-            if os.path.exists(temp_path):
-                os.remove(temp_path)
-        except OSError:
-            pass
-        return False
+    MEM_STORE[key] = data
+    return True
 
 
 def log_activity(action, details=""):
