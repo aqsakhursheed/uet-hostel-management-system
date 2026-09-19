@@ -55,7 +55,7 @@ The Admin Dashboard is available for project evaluation and portfolio demonstrat
 **Email:** `admin@uet.edu.pk`
 **Password:** admin123
 
-> This is a demo account created specifically to allow visitors and recruiters to explore the administrative side of the project.
+> This is a demo account created specifically to allow visitors and recruiters to explore the administrative side of the project. It is not a real UET administrative account.
 
 ---
 
@@ -71,7 +71,7 @@ The Admin Dashboard is available for project evaluation and portfolio demonstrat
 | JSON         | Demo data storage         |
 | Gunicorn     | Production server         |
 | Git & GitHub | Version control           |
-| Render       | Deployment                |
+| Vercel       | Deployment platform       |
 
 ---
 
@@ -222,7 +222,7 @@ Set:
 ```text
 ADMIN_EMAIL=admin@uet.edu.pk
 ADMIN_PASSWORD=admin123
-SECRET_KEY=your-secret-key
+SECRET_KEY=uet-hostel-secret-key-2026
 SESSION_COOKIE_SECURE=0
 ```
 
@@ -238,21 +238,20 @@ Open the local URL shown by Flask in your browser.
 
 ## ☁️ Deployment
 
-The project can be deployed on **Render**.
+The project is deployed using **Vercel**.
 
-### Build Command
+### Live Deployment
 
-```bash
-pip install -r requirements.txt
-```
+**Live Website:**
+https://uet-hostel-management-system.vercel.app
 
-### Start Command
+The Flask application is deployed through Vercel's Python runtime.
 
-```bash
-gunicorn backend:app
-```
+The source code is maintained in GitHub and the live application is connected to the project repository.
 
 ### Required Environment Variables
+
+The application uses environment variables for sensitive configuration.
 
 ```text
 ADMIN_EMAIL
@@ -266,6 +265,7 @@ For HTTPS deployment on Render:
 ```text
 SESSION_COOKIE_SECURE=1
 ```
+Deployment configuration may vary depending on the hosting environment. The project source includes the required application configuration for the deployed Flask application.
 
 ---
 
@@ -302,6 +302,7 @@ The main goals of this project were to demonstrate:
 * Error handling
 * Deployment preparation
 * Git and GitHub workflow
+* Web deployment
 
 ---
 
