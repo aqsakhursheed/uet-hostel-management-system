@@ -300,6 +300,19 @@ def login_api():
     if not email or not password:
         return err("Email and password are required")
 
+    # Direct Environment Variable Fallback for Admin (Vercel Fix)
+    env_admin_email = clean_text(os.getenv("ADMIN_EMAIL", "admin@uet.edu.pk"), 254).lower()
+    env_admin_pass = os.getenv("ADMIN_PASSWORD", "admin123")
+
+    if role == "admin" and email == env_admin_email and password == env_admin_pass:
+        session.clear()
+        session["user_id"] = "ADMIN001"
+        session["role"] = "admin"
+        session["name"] = "Admin"
+        session["email"] = env_admin_email
+        session["reg_no"] = ""
+        return jsonify({"success": True, "redirect": "/dashboard"})
+
     users = read_file("users")
     user = next((u for u in users if u.get("email", "").lower() == email and u.get("role") == role), None)
     if not user or not check_password_hash(user.get("password", ""), password):
