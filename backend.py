@@ -903,7 +903,9 @@ def delete_application(aid):
     return jsonify({"success": True})
 
 
+# Execute admin creation on import for serverless environments (Vercel)
+init_admin()
+
 if __name__ == "__main__":
-    init_admin()
-    # Local development only. Production uses Gunicorn via the Render start command.
+    # Local development only
     app.run(host="0.0.0.0", port=int(os.getenv("PORT", "5000")), debug=False)
