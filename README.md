@@ -10,7 +10,7 @@ This project was developed as a **Software Engineering academic/portfolio projec
 ## 🚀 Live Demo
 
 **Live Website:**
-Add your Render URL here after deployment.
+uet-hostel-management-system.vercel.app
 
 ---
 
